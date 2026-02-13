@@ -1,0 +1,19 @@
+.search-container{
+	background-image: url("../../../public/images/car\ backdrop\ ai\ edit\ 3.jpg");
+	position: absolute;
+	width: 100vw;
+	height: 450px;
+}
+
+.search-label{
+	background-color: "#E62117";
+    color: "white";
+	border-color: "#E62117";
+}
+
+.search-text-box{
+	background-color: "transparent";
+    color: "white";
+    border-color: "#E62117";
+    outline: "none"
+}
