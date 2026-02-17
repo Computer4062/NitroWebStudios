@@ -27,6 +27,20 @@ function Details() {
       });
   }, []);
 
+  // ... inside your component ...
+const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+const [isZoomed, setIsZoomed] = useState(false);
+
+const handleMouseMove = (e) => {
+  const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+  
+  // Calculate mouse position in percentage
+  const x = ((e.pageX - left) / width) * 100;
+  const y = ((e.pageY - top) / height) * 100;
+  
+  setZoomPos({ x, y });
+};
+
   return (
     <>
       <section>
@@ -56,13 +70,32 @@ function Details() {
 			<div className="row g-5">
 				{/* 2. LEFT SIDE: Image Gallery */}
 				<div className="col-md-7">
-					<div className="main-image-container mb-3 border border-secondary overflow-hidden bg-black">
+						<div 
+						className="main-image-container mb-3 border border-secondary overflow-hidden bg-black position-relative"
+						onMouseMove={handleMouseMove}
+						onMouseEnter={() => setIsZoomed(true)}
+						onMouseLeave={() => setIsZoomed(false)}
+						style={{ cursor: isZoomed ? 'zoom-in' : 'pointer' }}
+					>
 						<img 
-							src={`http://localhost:3000/public/images/${gallery[activeImg]}`} 
-							className="img-fluid w-100 main-car-image" 
-							alt={car.model}
-							style={{ minHeight: "450px", objectFit: "cover" }}
+						src={`http://localhost:3000/public/images/${gallery[activeImg]}`} 
+						className="img-fluid w-100 main-car-image" 
+						alt={car.model}
+						style={{ 
+							minHeight: "450px", 
+							objectFit: "cover",
+							transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`, // Point of focus
+							transform: isZoomed ? 'scale(2.5)' : 'scale(1)', // Scale factor
+							transition: isZoomed ? 'none' : 'transform 0.5s ease' // Smooth exit
+						}}
 						/>
+						
+						{/* Optional: Small Hint Overlay */}
+						{!isZoomed && (
+						<div className="position-absolute bottom-0 end-0 m-3 px-2 py-1 bg-dark text-warning small fw-bold opacity-75">
+							<i className="bi bi-search me-1"></i> HOVER TO ZOOM
+						</div>
+						)}
 					</div>
 					
 					{/* Thumbnails */}
@@ -159,6 +192,7 @@ function Details() {
 									onClick={() => window.scrollTo(0, 0)} 
 									to={`/inventory/${item._id}`} 
 									className="btn btn-outline-warning btn-sm w-100 fw-bold rounded-0 py-2"
+									state = {{car: item}}
 								>
 									VIEW DETAILS
 								</Link>
