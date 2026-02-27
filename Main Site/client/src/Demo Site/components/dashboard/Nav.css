@@ -1,0 +1,19 @@
+.sticky-sidebar {
+    position: -webkit-sticky;
+    position: sticky;
+    /* This ensures it starts exactly below your navbar */
+    top: 56px; 
+    /* This makes the sidebar take up the full height minus the navbar */
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+/* Optional: Slim scrollbar for a cleaner look */
+.sticky-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.sticky-sidebar::-webkit-scrollbar-thumb {
+    background: #e1e1e1;
+    border-radius: 10px;
+}

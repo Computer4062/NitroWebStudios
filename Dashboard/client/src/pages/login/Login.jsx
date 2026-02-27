@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Login() {
-	const [formData, setFormData] = useState({username: '', password: ''});
+const Login = () => {
 	const navigate = useNavigate();
 
 	// Check if user is already logged in
@@ -27,72 +26,106 @@ function Login() {
 		checkUserAuth();
 	}, [navigate]);
 
-	// For submitting entry form
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+    const [formData, setFormData] = useState({ username: '', password: '', code: '' });
+    const [step, setStep] = useState(1); // Step 1: Login, Step 2: 2FA Code
+    const [error, setError] = useState('');
 
-		try{
-			const response = await fetch('http://localhost:3000/api/accounts/login', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(formData),
-				credentials: 'include'
-			});
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        const endpoint = step === 1 
+            ? "http://localhost:3000/api/accounts/login-step-1" 
+            : "http://localhost:3000/api/accounts/login-step-2";
 
-			if (!response.ok){
-				// If back end sends 401 or 400 show the notification
-				const data = await response.json();
-				alert(data.message);
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
 
-			} else {
-				navigate("/dashboard");
-			}
+            const data = await response.json();
 
-		} catch(error){
-			console.error("Network error: ", error);
-		}
-	}
+            if (response.ok) {
+                if (step === 1) {
+                    setStep(2); // Success! Now show the code input
+                    setError('');
+                } else {
+                    window.location.href = "/dashboard"; // Fully logged in!
+                }
+            } else {
+                // If code is wrong or login fails, reboot the page/state
+                alert(data.message || "Authentication failed. Restarting...");
+                window.location.reload(); 
+            }
+        } catch (err) {
+            setError("Server connection failed");
+        }
+    };
 
-  return (
-    <>
-	<div class="d-flex align-items-center justify-content-center py-4 bg-body-tertiary vw-100 vh-100">
-		<main class="form-signin m-auto" style={{ width: '300px'}}>
-		<form onSubmit={handleSubmit}>
-			<img class="mb-4" src="../../public/icon.png" alt="" width="72" height="57" />
+    return (
+        <div className="d-flex align-items-center justify-content-center py-4 bg-body-tertiary vw-100 vh-100">
+            <main className="form-signin m-auto" style={{ width: '300px' }}>
+                <form onSubmit={handleSubmit}>
+                    <img className="mb-4" src="../../public/icon.png" alt="" width="72" height="57" />
+                    <h1 className="h3 mb-3 fw-normal">
+                        {step === 1 ? "Please sign in" : "Enter Verification Code"}
+                    </h1>
 
-			<h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-			<div class="form-floating pb-1">
-			<input 
-				type="username" 
-				class="form-control" 
-				id="floatingInput" 
-				placeholder="username"
-				onChange={(e) => setFormData({...formData, username: e.target.value})} />
-			<label for="floatingInput">username</label>
-			</div>
+                    {/* STEP 1 FIELDS: Username and Password */}
+                    {step === 1 && (
+                        <>
+                            <div className="form-floating pb-1">
+                                <input 
+                                    type="text" 
+                                    className="form-control" 
+                                    placeholder="username"
+                                    onChange={(e) => setFormData({...formData, username: e.target.value})} 
+                                    required
+                                />
+                                <label>username</label>
+                            </div>
 
-			<div class="form-floating mb-3">
-			<input 
-				type="password" 
-				class="form-control" 
-				id="floatingPassword"
-				placeholder="Password"
-				onChange={(e) => setFormData({...formData, password: e.target.value})} />
-			<label for="floatingPassword">Password</label>
-			</div>
+                            <div className="form-floating mb-3">
+                                <input 
+                                    type="password" 
+                                    className="form-control" 
+                                    placeholder="Password"
+                                    onChange={(e) => setFormData({...formData, password: e.target.value})} 
+                                    required
+                                />
+                                <label>Password</label>
+                            </div>
+                        </>
+                    )}
 
-			<button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
-			
-			<hr />
-			<p class="mb-3 text-body-secondary">Powered by NitroWeb Studios</p>
-		</form>
-		</main>
+                    {/* STEP 2 FIELD: Verification Code (Otherwise Invisible) */}
+                    {step === 2 && (
+                        <div className="form-floating mb-3">
+                            <input 
+                                type="text" 
+                                className="form-control border-primary shadow-sm" 
+                                placeholder="000000"
+                                onChange={(e) => setFormData({...formData, code: e.target.value})} 
+                                autoFocus
+                                required
+                            />
+                            <label>Verification Code</label>
+                            <div className="form-text">Check your email for a 6-digit code.</div>
+                        </div>
+                    )}
 
-	</div>
-    </>
-  )
-}
+                    <button className="btn btn-primary w-100 py-2" type="submit">
+                        {step === 1 ? "Sign in" : "Verify & Login"}
+                    </button>
+                    
+                    <hr />
+                    <p className="mb-3 text-body-secondary text-center">Powered by NitroWeb Studios</p>
+                </form>
+            </main>
+        </div>
+    );
+};
 
 export default Login;

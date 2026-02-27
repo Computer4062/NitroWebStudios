@@ -1,0 +1,307 @@
+/* Home.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Cormorant+Garamond:wght@400;500&display=swap');
+
+.home-body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Cormorant Garamond', serif;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 0% 0%, rgba(46, 12, 64, 0.6) 0%, transparent 40%),
+    radial-gradient(circle at 100% 0%, rgba(64, 12, 42, 0.6) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(12, 28, 64, 0.6) 0%, transparent 40%),
+    radial-gradient(circle at 0% 100%, rgba(38, 12, 64, 0.6) 0%, transparent 40%),
+    radial-gradient(circle at center, #0a1622 0%, #050a0f 60%, #000000 100%);
+  background-color: #000;
+  background-size: 120% 120%;
+  animation: nebulaShift 15s ease infinite alternate;
+  color: white;
+  height: 100vh;
+  width: 100vw;
+}
+
+@keyframes nebulaShift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+#galaxyCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+#mainLogo {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Impact', sans-serif;
+  font-size: 8vw; 
+  letter-spacing: 12px;
+  color: white;
+  z-index: 100;
+  text-align: center;
+  width: 100%;
+  transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, top;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#mainLogo.collapsed {
+  top: 60px;
+  transform: translate(-50%, 0);
+  font-size: 68px;
+  letter-spacing: 6px;
+}
+
+.content-container {
+  opacity: 0;
+  transition: opacity 1s ease 0.5s;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.active .content-container {
+  opacity: 1;
+}
+
+.section {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 38px;
+  padding: 60px;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  background: transparent !important; 
+}
+
+/* SHINY METALLIC COMPONENTS */
+.contact-block, .navigator {
+  background: #000000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-block::after, .navigator::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: skewX(-25deg);
+  animation: shine 5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+
+@keyframes syncedFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(30px); }
+}
+
+.contact-icons {
+  position: fixed;
+  top: 180px; 
+  left: 40px;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-100vw);
+  transition: opacity 0.6s ease;
+}
+
+.contact-icons.show {
+  opacity: 1;
+  pointer-events: auto;
+  animation: contactFlyIn 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards, syncedFloat 10s ease-in-out 0.6s infinite;
+}
+
+@keyframes contactFlyIn {
+  0% { transform: translateX(-100vw) scale(0.8); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+.contact-row {
+  padding: 14px 30px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: white; 
+  text-decoration: none;
+  transition: 0.3s ease;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.contact-row:hover { background: rgba(255,255,255,0.05); }
+
+.navigator {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  padding: 12px 30px;
+  border-radius: 40px;
+  display: flex;
+  gap: 16px;
+  z-index: 10;
+  min-width: 600px;
+  opacity: 0;
+  transform: translateY(100px);
+  transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.4s ease;
+}
+
+.active .navigator {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.nav-item {
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-size: 16px;
+  color: white; 
+  cursor: pointer;
+  border: 2px solid transparent; 
+  white-space: nowrap;
+}
+
+.nav-item.active { border: 2px solid white; }
+
+/* NEW: Scroll Down Indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.8;
+  animation: fadePulse 2s infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.scroll-hint i {
+  font-size: 24px;
+}
+
+.scroll-hint span {
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+@keyframes fadePulse {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, 0); }
+  50% { opacity: 1; transform: translate(-50%, 10px); }
+}
+
+/* MOBILE RESPONSIVENESS */
+@media (max-width: 768px) {
+  #mainLogo {
+    font-size: 12vw;
+    letter-spacing: 5px;
+  }
+
+  #mainLogo.collapsed {
+    font-size: 32px;
+    top: 40px;
+  }
+
+  .section {
+    font-size: 24px;
+    padding: 30px;
+  }
+
+  .navigator {
+    min-width: 90%;
+    right: 5%;
+    bottom: 20px;
+    padding: 8px 15px;
+    gap: 8px;
+  }
+
+  .nav-item {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .contact-icons {
+    left: 20px;
+    top: 120px;
+    width: calc(100% - 40px);
+  }
+
+  .contact-block {
+    width: 100%;
+  }
+
+  .contact-row {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+}
+
+.landing-hint {
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 101; /* Above the logo */
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.landing-hint.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.landing-hint i {
+  font-size: 28px;
+  animation: handSway 2s ease-in-out infinite;
+}
+
+.landing-hint span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+@keyframes handSway {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(15px); opacity: 1; }
+}
+
+/* Adjusting the logo slightly to make room for the hint on mobile */
+@media (max-width: 768px) {
+  .landing-hint span {
+    font-size: 14px;
+  }
+}

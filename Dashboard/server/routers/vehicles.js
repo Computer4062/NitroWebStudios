@@ -6,7 +6,19 @@ const router = express.Router();
 // GET all vehicles
 router.get('/all', async (req, res) => {
     try {
-        const vehicle_data = await Vehicle.find({});
+        const vehicle_data = await Vehicle.find({ draft: false });
+        res.status(200).json(vehicle_data);
+
+    } catch (error) {
+        console.error("Error fetching vehicles:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+// GET drafted vehicles (schedueled to be public later)
+router.get('/drafts', async (req, res) => {
+    try {
+        const vehicle_data = await Vehicle.find({ draft: true });
         res.status(200).json(vehicle_data);
 
     } catch (error) {

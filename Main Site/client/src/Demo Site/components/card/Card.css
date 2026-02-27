@@ -1,0 +1,57 @@
+.car-card {
+      background-color: #1a1a1a; /* Slightly lighter than pure black */
+      border: 1px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .car-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+      border-color: #ffc107; /* Gold glow on hover */
+    }
+
+    /* Image sizing */
+    .car-card img {
+      height: 220px;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    /* Text styling */
+    .car-year {
+      font-size: 0.85rem;
+      color: #ffc107; /* Gold for the year */
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .car-model {
+      color: #ffffff;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .car-price {
+      font-size: 1.25rem;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .btn-view-details {
+      background-color: transparent;
+      border: 1px solid #fff;
+      color: #fff;
+      border-radius: 20px;
+      padding: 8px 20px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .btn-view-details:hover {
+      background-color: #fff;
+      color: #000;
+    }
