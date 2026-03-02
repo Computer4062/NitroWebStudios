@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 	const navigate = useNavigate();
+	const [loading, setLoading] = useState(false);
 
 	// Check if user is already logged in
 	useEffect(() => {
 		const checkUserAuth = async() => {
+		    setLoading(true); // 1. Start the spinn
+
 			try{
 				const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
 					method: 'GET',
@@ -20,7 +23,9 @@ const Login = () => {
 
 			} catch(error) {
 				console.error(error.message);
-			}
+			} finally {
+        	    setLoading(false); // 2. Stop the spinner (happens whether success or error)
+            }
 		}
 
 		checkUserAuth();
@@ -116,8 +121,16 @@ const Login = () => {
                         </div>
                     )}
 
-                    <button className="btn btn-primary w-100 py-2" type="submit">
-                        {step === 1 ? "Sign in" : "Verify & Login"}
+                    <button className="btn btn-primary w-100 py-2 fw-bold" type="submit" disabled={loading}>
+                        {loading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                {step === 1 ? "Sending Code..." : "Verifying..."}
+                            </>
+                        ) : (
+                            // Normal state: Show text based on which step the user is on
+                            step === 1 ? "Sign in" : "Verify & Login"
+                        )}
                     </button>
                     
                     <hr />

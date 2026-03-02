@@ -333,9 +333,11 @@ router.put('/update-profile', async (req, res) => {
 // Code for managing other accounts
 
 // Get all users for the management table
+// Backend: admin.js
 router.get('/users', async (req, res) => {
     try {
-        const users = await Account.find({}, 'username email admin profile_img');
+        // Added first_name and last_name to the selection
+        const users = await Account.find({}, 'username email admin profile_img first_name last_name');
         res.json(users);
     } catch (err) {
         res.status(500).send("Error fetching users");
