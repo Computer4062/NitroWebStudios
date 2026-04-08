@@ -25,6 +25,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser());
 app.use(morgan("dev"))
 app.use('/public/images', express.static('public/images'));
+app.use('/public/uploads', express.static('public/uploads'));
 app.set('etag', false);
 
 app.use("/api/vehicles", vehicleRoutes)

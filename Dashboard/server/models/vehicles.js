@@ -5,17 +5,19 @@ const vehicleSchema = new mongoose.Schema({
 	year: {type: Number, required: true},
 	make: { type: String, required: true },
     model: { type: String, required: true },
+	draft: {type: Boolean, required: true},
 	milleage: {type: Number},
 	cylinders: {type: Number},
 	motors: {type: Number},
 	transmission: {type: String},
-	type: {type: String, required: true},
+	type: {type: String},
 	doors: {type: Number},
-	color: {type: String, required: true},
+	color: {type: String},
 	fuel: {type: String},
 	description: {type: String},
 	images: [String],
-	_electric: {type: Boolean}
+	_electric: {type: Boolean},
+	featured: {type: Boolean}
 
 }, {collection: 'vehicles'});
 

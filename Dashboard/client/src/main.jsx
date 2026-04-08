@@ -13,12 +13,12 @@ import Team from './pages/team/Team.jsx'
 // Admin end related pages
 import Dashboard from './pages/dashboard/Board/Dashboard.jsx'
 import ItemsList from './pages/dashboard/Items/ItemsList.jsx'
-import Editor from './pages/dashboard/Items/Editor.jsx'
 import AddItems from './pages/dashboard/Items/AddItems.jsx'
+import Editor from './pages/dashboard/Items/Editor.jsx'
 import Drafts from './pages/dashboard/Items/Drafts.jsx'
 import Profile from './pages/dashboard/Profile/Profile.jsx'
-import SiteEditor from './pages/dashboard/SiteEditor/Editor.jsx'
 import Accounts from './pages/dashboard/Accounts/Accounts.jsx'
+import HelpCenter from './pages/dashboard/HelpCenter/HelpCenter.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -33,12 +33,12 @@ createRoot(document.getElementById('root')).render(
       /* Dashboard navigation paths */
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/dashboard/items" element={<ItemsList />} />
-      <Route path="/dashboard/items/editor" element={<Editor />} />
       <Route path="/dashboard/items/add" element={<AddItems />} />
       <Route path="/dashboard/items/drafts" element={<Drafts />} />
+      <Route path="/dashboard/items/editor" element={<Editor />} />
       <Route path="/dashboard/profile" element={<Profile />} />
-      <Route path="/dashboard/site-editor" element={<SiteEditor />} />
       <Route path="/dashboard/accounts" element={<Accounts />} />
+      <Route path="/dashboard/info" element={<HelpCenter />} />
     </Routes>
   </BrowserRouter>
 )

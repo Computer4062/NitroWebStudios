@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react"
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import Dash from "../../../components/Dashboard/Dash.jsx"
 import Nav from "../../../components/Dashboard/Nav.jsx"
@@ -66,6 +66,7 @@ function Accounts() {
     	first_name: '', last_name: '', admin: false
 	});
 
+	// Function for registering users
 	const handleRegisterSubmit = async (e) => {
 		e.preventDefault();
 		setLoading(true); // 1. Start the spinn
@@ -94,6 +95,7 @@ function Accounts() {
     	}
 	};
 
+	// Styles for the register a user pop up card
 	const overlayStyle = {
 		position: 'fixed',
 		top: 0,
@@ -123,16 +125,30 @@ function Accounts() {
 
 		<Nav/>
 
-		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-			{/* 1. The Updated Button */}
-			<div className="d-flex justify-content-between align-items-center pt-3 pb-2 mb-4 border-bottom">
-				<h1 className="h2">Account Management</h1>
-				<button className="btn btn-success shadow-sm" onClick={() => setShowRegisterModal(true)}>
-					<i className="bi bi-person-plus-fill me-2"></i>+ Register New User
-				</button>
+		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
+
+			{/* Header Section: Amazon-style Breadcrumbs & Actions */}
+			<div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+				<div>
+					
+					<nav aria-label="breadcrumb">
+						<ol className="breadcrumb mb-1">
+						<li className="breadcrumb-item small text-muted">Accounts</li>
+						<li className="breadcrumb-item small active" aria-current="page">Settings</li>
+						</ol>
+					</nav>
+
+					<h1 className="h3 fw-bold text-dark">Manage Accounts</h1>
+				</div>
+
+					<div className="btn-toolbar mb-2 mb-md-0">
+					<Link onClick={() => setShowRegisterModal(true)} className="btn btn-success shadow-sm">
+						<i className="bi bi-person-plus-fill me-2"></i>+ Register New Usere
+					</Link>
+					</div>
 			</div>
 
-			{/* 2. The Popup Modal (Primary Blue Theme) */}
+			{/* 2. The Popup Modal For registering users (Primary Blue Theme) */}
 			{showRegisterModal && (
 				<div className="modal-overlay" style={overlayStyle}>
 					<div className="card shadow-lg border-0 animate__animated animate__zoomIn" style={modalCardStyle}>
@@ -246,12 +262,15 @@ function Accounts() {
 									style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
 									alt="Profile"
 								/>
-								<div className="mb-2"> {/* Added div for better spacing on mobile */}
-									<p className="small text-muted mb-0">Member Status</p>
-									<span className={`badge ${selectedUser.admin ? 'bg-danger' : 'bg-primary'}`}>
-										{selectedUser.admin ? 'Administrator' : 'Editor'}
-									</span>
-								</div>
+							<div className="mt-2">
+								{selectedUser.admin && <span className="badge bg-danger me-1">Admin</span>}
+								{selectedUser.technician && <span className="badge bg-info me-1">Technician</span>}
+								
+								{/* Only shows if they are neither an Admin nor a Technician */}
+								{!selectedUser.admin && !selectedUser.technician && (
+									<span className="badge bg-primary">Editor</span>
+								)}
+							</div>
 							</div>
 						</div>
 					</div>
@@ -279,9 +298,15 @@ function Accounts() {
 										</div>
 									</td>
 									<td>
-										<span class={`badge ${user.admin ? 'bg-danger' : 'bg-primary'}`}>
-											{user.admin ? 'Admin' : 'Editor'}
-										</span>
+										<div>
+											{user.admin && <span className="badge bg-danger me-1">Admin</span>}
+											{user.technician && <span className="badge bg-info me-1">Technician</span>}
+											
+											{/* Only shows if they are neither an Admin nor a Technician */}
+											{!user.admin && !user.technician && (
+												<span className="badge bg-primary">Editor</span>
+											)}
+										</div>
 									</td>
 									<td class="text-end">
 										<button 

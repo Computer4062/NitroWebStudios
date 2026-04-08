@@ -116,7 +116,7 @@ function Profile() {
 
         <Nav/>
 
-        <main class="col-md-9 ms-md-auto col-lg-10 px-md-4 py-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
             <h1 class="h2">My Profile</h1>
             <button type="button" class="btn btn-primary mx-3" onClick={handleUpdateProfile}>Update</button>

@@ -1,41 +1,31 @@
-import {useState, useEffect} from "react"
+import {useState, useEffect, useRef} from "react"
 import { useNavigate } from "react-router-dom";
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
 
-import HomePageEdits from "./HomePageEdits.jsx";
+import HomePageEdits from "./FooterEdits.jsx";
+import GenericEdits from "./GenericEditor.jsx";
+import ContactDetails from "./ContactDetails.jsx";
 
 function Profile() {
-  const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
-
+  // For simulation, setting mobile and desktop mode
   const [viewMode, setViewMode] = useState('desktop');
 
-  // Check if user is authorized to access this page
-  useEffect(() => {
-	const checkUserAuth = async() => {
-		try{
-			const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
-				method: 'GET',
-				credentials: 'include'
-			});
+  // To adjust the content editor cards as per the current page user visits in the iframe
+  const [simulatorPath, setSimulatorPath] = useState("/"); // Default to home
+  const iframeRef = useRef(null);
 
-			if(response.status === 401){
-				// If not logged in, kick them to login page
-				navigate("/login");
-      }
-
-      const data = await response.json();
-      setIsAdmin(data.admin);
-
-		} catch(error) {
-			navigate("/login");
-		}
-	}
-
-	checkUserAuth();
-  }, [navigate]);
+  const handleIframeLoad = () => {                                               // Function to check the iframe URL whenever it loads a new page
+    try {
+      const currentHref = iframeRef.current.contentWindow.location.pathname;
+      setSimulatorPath(currentHref);
+    } catch (err) {
+      // If the iframe is on a different domain, security will block this.
+      // In that case, we'd need to use 'postMessage'.
+      console.warn("Cross-origin or path access error", err);
+    }
+  };
 
   return (
     <>
@@ -44,7 +34,7 @@ function Profile() {
       <div class="container-fluid">
       <div class="row">
 
-        <Nav isAdmin={isAdmin} />
+        <Nav />
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 bg-light">
         {/* Header Section */}
@@ -93,7 +83,9 @@ function Profile() {
             <div class="ratio h-100 w-100 bg-white">
               <iframe 
                 src="/" 
-                title="Responsive Preview" 
+                ref={iframeRef}
+                onLoad={handleIframeLoad}
+                title="Responsive Preview"
                 class="w-100 h-100"
                 style={{ 
                   border: 'none',
@@ -113,43 +105,62 @@ function Profile() {
           </div>
         </div>
 
-        {/* Content Editor Section */}
-  <div className="mt-5 border-top pt-4">
-  <div className="row justify-content-center">
-    <div className="col-12 col-xl-10">
-      <div className="d-flex align-items-center mb-4">
-        <i className="bi bi-pencil-square fs-4 text-primary me-2"></i>
-        <h3 className="h5 mb-0">Page Content Settings</h3>
-      </div>
+          {/* Content Editor Section */}
+        <div className="mt-5 border-top pt-4">
+        <div className="row justify-content-center">
+          <div className="col-12 col-xl-10">
+            <div className="d-flex align-items-center mb-4">
+              <i className="bi bi-pencil-square fs-4 text-primary me-2"></i>
+              <h3 className="h5 mb-0">Page Content Settings</h3>
+            </div>
 
-      <HomePageEdits />
+            {/* These are the cards that shows up for each page */}
+            {(simulatorPath === "/") && (
+              <>
+                <HomePageEdits />
+                <GenericEdits />
+              </>
+            )}
 
-      {/* Preview button */}
-      <div className="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm border mb-5">
-        <div className="text-muted small">
-          <i className="bi bi-info-circle me-1"></i> 
-          Review your changes in the simulator above before saving.
-        </div>
+            {(simulatorPath === "/contact") && (
+              <>
+                <ContactDetails />
+              </>
+            )}
 
-        <button 
-          type="button" 
-          className="btn btn-primary px-5 fw-bold"
-          onClick={() => console.log("Save button clicked - Logic to be added later")}
-        > Preview
-        </button>
+            {/* Preview & publish buttons section */}
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center bg-white p-3 rounded shadow-sm border mb-5 gap-3">
+              
+              {/* Left Side: Info Text */}
+              <div className="text-muted small">
+                <i className="bi bi-info-circle text-primary me-2"></i> 
+                Review your changes in the simulator above before saving.
+              </div>
 
-        <button 
-          type="button" 
-          className="btn btn-danger px-5 fw-bold"
-          onClick={() => console.log("Save button clicked - Logic to be added later")}
-        >
-          <i className="bi bi-check2-circle me-2"></i> Publish
-        </button>
-        
+              {/* Right Side: Button Group */}
+              <div className="d-flex gap-2 w-100 w-md-auto">
+                <button 
+                  type="button" 
+                  className="btn btn-outline-primary px-4 fw-bold flex-grow-1 flex-md-grow-0"
+                  onClick={() => console.log("Preview clicked")}
+                >
+                  Preview
+                </button>
+
+                <button 
+                  type="button" 
+                  className="btn btn-primary px-4 fw-bold flex-grow-1 flex-md-grow-0"
+                  onClick={() => console.log("Publish clicked")}
+                >
+                  <i className="bi bi-cloud-arrow-up-fill me-2"></i> Publish
+                </button>
+              </div>
+              
+            </div>
           </div>
-          </div>
+          
         </div>
-      </div>
+        </div>
 
       </main>
 

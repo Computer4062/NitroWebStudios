@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 
 import multer from 'multer'
 import path from 'path'
-import fs from 'fs'
 import { fileURLToPath } from 'url';
 import sharp from 'sharp'
 
@@ -13,6 +12,8 @@ import crypto from 'crypto';
 import 'dotenv/config';
 
 import {Account} from '../models/users.js'
+
+import { verifyAdmin, verifyUser } from '../middleware/Authenciation.js';
 
 const router = express.Router();
 
@@ -86,7 +87,7 @@ router.post('/login-step-2', async (req, res) => {
 // -----------------------------------------------------
 
 // Register a new user to the database
-router.post('/register', async(req, res) => {
+router.post('/register', verifyUser, async(req, res) => {
 	try{
 		const {
 			username, password, email, admin,
@@ -114,7 +115,7 @@ router.post('/register', async(req, res) => {
 			last_name: last_name
 		};
 
-		await Account.insertOne(newUser);
+		await Account.create(newUser);
 		res.status(200).json({code: 201, message: "User registered successfully!"});
 
 	}catch(error){
@@ -143,7 +144,6 @@ router.get('/check-auth', async(req, res) => {
 		// If token is legit
 		return res.status(200).json({
 			authenciated: true,
-			userId: decoded.userId,
 			admin: user.admin
 		});
 	}catch(error){
@@ -337,7 +337,7 @@ router.put('/update-profile', async (req, res) => {
 router.get('/users', async (req, res) => {
     try {
         // Added first_name and last_name to the selection
-        const users = await Account.find({}, 'username email admin profile_img first_name last_name');
+        const users = await Account.find({}, 'username email admin technician profile_img first_name last_name');
         res.json(users);
     } catch (err) {
         res.status(500).send("Error fetching users");
@@ -355,7 +355,7 @@ router.put('/update-email/:id', async (req, res) => {
 });
 
 // Admin-only delete account
-router.delete('/delete-user/:id', async (req, res) => {
+router.delete('/delete-user/:id', verifyAdmin, async (req, res) => {
     try {
         // Optional: Prevent admin from deleting themselves
         if (req.params.id === req.userId) {
