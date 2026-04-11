@@ -1,10 +1,21 @@
 import express from 'express';
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
+import fs from 'fs';
+import path from 'path';
 
 // Configure router
 const router = express.Router();
 
 // Configure client
+const keyPath = path.resolve('./google-credentials.json');                                                    // MANUALLY CHECK THE FILE
+
+if (fs.existsSync(keyPath)) {
+    const content = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+    console.log("✅ File found! Service Account Email:", content.client_email);
+} else {
+    console.error("❌ FILE NOT FOUND AT:", keyPath);
+}
+
 const analyticsClient = new BetaAnalyticsDataClient({
     keyFilename: './google-credentials.json', 
 });
