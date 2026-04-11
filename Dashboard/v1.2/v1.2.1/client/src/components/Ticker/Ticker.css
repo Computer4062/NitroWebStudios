@@ -1,0 +1,49 @@
+.ticker-wrapper {
+  width: 100%;
+  background: #111; /* Dark background makes the glow pop */
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.ticker-content {
+  display: inline-block;
+  animation: scroll-left 20s linear infinite;
+}
+
+.ticker-item {
+  display: inline-block;
+  padding: 0 50px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  
+  /* Gradient Text Effect */
+  background: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  /* The Glow Effect */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  animation: glow-move 5s linear infinite;
+}
+
+/* Move text from right to left */
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Make the colors shift while moving */
+@keyframes glow-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Pause animation on hover so users can read it */
+.ticker-wrapper:hover .ticker-content {
+  animation-play-state: paused;
+}
