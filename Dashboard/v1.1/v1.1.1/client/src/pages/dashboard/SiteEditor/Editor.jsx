@@ -9,7 +9,7 @@ const FullRepoEditor = () => {
 
     // 1. Fetch the entire file tree on mount
     useEffect(() => {
-        fetch('http://localhost:3000/api/editor/github/tree', { credentials: 'include' })
+        fetch('http://localhost:3000/api/editor/admin/github/tree', { credentials: 'include' })
             .then(res => res.json())
             .then(data => setFileTree(data))
             .catch(err => console.error("Tree load failed", err));
@@ -19,7 +19,7 @@ const FullRepoEditor = () => {
     const openFile = async (path) => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:3000/api/editor/github/get-content?path=${path}`, { credentials: 'include' });
+            const res = await fetch(`http://localhost:3000/api/editor/admin/github/get-content?path=${path}`, { credentials: 'include' });
             const data = await res.json();
             setSelectedFile(path);
             setCode(data.content);
@@ -31,7 +31,7 @@ const FullRepoEditor = () => {
     const handleSave = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3000/api/editor/github/push-changes', {
+            const response = await fetch('http://localhost:3000/api/editor/admin/github/push-changes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

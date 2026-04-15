@@ -1,0 +1,29 @@
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.graph-container-vertical {
+  background: linear-gradient(-45deg, #ff8c00, #e65100, #ffb347, #f57c00);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+  min-height: 250px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+/* Subtle grid overlay to look like an analytics chart */
+.graph-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  mask-image: radial-gradient(circle, black, transparent 80%);
+}

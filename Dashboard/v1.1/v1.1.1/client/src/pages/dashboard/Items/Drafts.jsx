@@ -13,7 +13,9 @@ function Drafts() {
 	const [searchQuery, setSearchQuery] = useState(""); // for search string
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/vehicles/drafts')
+    fetch('http://localhost:3000/api/vehicles/admin/drafts',{
+		credentials: 'include'
+	})
       .then((response) => response.json())
       .then((data) => {
 	  	setItems(data);
@@ -41,8 +43,9 @@ function Drafts() {
 		if (!confirmDelete) return;
   
 		try {
-			const response = await fetch(`http://localhost:3000/api/vehicles/delete/${id}`, {
+			const response = await fetch(`http://localhost:3000/api/vehicles/admin/delete/${id}`, {
 				method: 'DELETE',
+				credentials: 'include'
 			});
   
 			if (response.ok) {

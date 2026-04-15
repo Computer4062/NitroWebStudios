@@ -59,7 +59,7 @@ function Nav() {
       {/* Key Change: Added 'h-100' and 'd-flex flex-column'. 
         This creates a vertical box that spans the full height of the drawer.
       */}
-      <div className="offcanvas-body d-flex flex-column p-0 pt-lg-3 h-100">
+      <div className="offcanvas-body d-flex flex-column p-0 pt-lg-3 h-100 justify-content-between">
         
         {/* Top Section Wrapper */}
         <div className="flex-grow-1">
@@ -117,13 +117,7 @@ function Nav() {
                 <i className="bi bi-pencil-square"></i> Site Editor
               </a>
             </li>
-          </ul>
-
-        {/* Bottom Section Wrapper 
-          'mt-auto' works here because the parent is 'd-flex flex-column h-100'
-        */}
-        <div className="mt-auto px-3 pb-4 border-top pt-3 bg-white">
-          <ul className="nav flex-column gap-1">
+          
             <li className="nav-item">
               <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/info">
                 <i className="bi bi-question-circle"></i> Info
@@ -131,12 +125,11 @@ function Nav() {
             </li>
 
             <li className="nav-item">
-              <a className="nav-link d-flex align-items-center gap-2 text-danger mt-1" href="#" onClick={(e) => handleLogout()}>
+              <a className="nav-link d-flex align-items-center gap-2 text-danger" href="#" onClick={(e) => handleLogout()}>
                 <i className="bi bi-box-arrow-right"></i> Sign out
               </a>
             </li>
           </ul>
-        </div>
 
       </div>
     </div>

@@ -8,9 +8,9 @@ function Database() {
 
 	const handleDownloadDatabase = async () => {
 		try {
-			const response = await fetch('http://localhost:3000/api/database/download', {
+			const response = await fetch('http://localhost:3000/api/database/admin/download', {
 				method: 'GET',
-				credentials: 'include', 
+				credentials: 'include',
 			});
 
 			if (!response.ok) {

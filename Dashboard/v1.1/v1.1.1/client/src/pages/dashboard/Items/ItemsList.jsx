@@ -41,7 +41,7 @@ function ItemsList() {
 		if (!confirmDelete) return;
   
 		try {
-			const response = await fetch(`http://localhost:3000/api/vehicles/delete/${id}`, {
+			const response = await fetch(`http://localhost:3000/api/vehicles/admin/delete/${id}`, {
 				method: 'DELETE',
 			});
   

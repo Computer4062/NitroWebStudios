@@ -5,7 +5,8 @@ import path from 'path'
 import { fileURLToPath } from 'url';
 
 import {Vehicle} from "../models/vehicles.js"
-import { verifyAdmin, verifyUser } from '../middleware/Authenciation.js';
+
+import Logger from "../utils/Logger.js"
 
 // Router configuration
 const router = express.Router();
@@ -45,7 +46,7 @@ router.get('/all', async (req, res) => {
 
 // ------------------------------------------------------------------------------------------------- //
 // GET drafted vehicles (schedueled to be public later)
-router.get('/drafts', async (req, res) => {
+router.get('/admin/drafts', async (req, res) => {
     try {
         const vehicle_data = await Vehicle.find({ draft: true });
         res.status(200).json(vehicle_data);
@@ -104,7 +105,7 @@ router.get('/find/type/:type', async function(req, res) {
 
 // ------------------------------------------------------------------------------------------------- //
 // For adding a new vehicle to the database
-router.post('/addnew', upload.array('images'), async (req, res) => {
+router.post('/admin/addnew', upload.array('images'), async (req, res) => {
     try {
         // Text data is in req.body
         const { make, model, year, price, description, electric, featured, draft, type } = req.body;
@@ -138,7 +139,7 @@ router.post('/addnew', upload.array('images'), async (req, res) => {
 
 // ------------------------------------------------------------------------------------------------- //
 // For updating list of vehicles in database
-router.put('/update/:id', upload.array('images'), async (req, res) => {
+router.put('/admin/update/:id', upload.array('images'), async (req, res) => {
     const { id } = req.params;
 
     // Delete the old images
@@ -167,8 +168,6 @@ router.put('/update/:id', upload.array('images'), async (req, res) => {
     // Add the new images
     const updateData = req.body;
 
-    console.log(updateData); // <-- TEST FEATURE
-
     // Check if new images were uploaded
     if (req.files && req.files.length > 0) {
         updateData.images = req.files.map(file => `/uploads/vehicles/${file.filename}`);
@@ -180,7 +179,7 @@ router.put('/update/:id', upload.array('images'), async (req, res) => {
 
 // ------------------------------------------------------------------------------------------------- //
 // Delete a vehicle listing
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/admin/delete/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
@@ -207,25 +206,6 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(200).json({ message: "Listing and associated images deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }
-});
-
-router.get("/download", verifyUser, async (req, res) => {
-    try {
-        // 1. Fetch all data from your Vehicle model
-        const vehicles = await Vehicle.find({});
-
-        // 2. Set headers to tell the browser it's a file download
-        res.setHeader('Content-Type', 'application/json');
-        res.setHeader('Content-Disposition', 'attachment; filename=vehicle_database_export.json');
-
-        // 3. Log the action (using our new logger!)
-        logger("ADMIN", "DB_DOWNLOAD");
-
-        // 4. Send the data
-        res.status(200).send(JSON.stringify(vehicles, null, 2));
-    } catch (err) {
-        res.status(500).send("Export failed");
     }
 });
 

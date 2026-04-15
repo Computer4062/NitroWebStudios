@@ -104,24 +104,6 @@ function UpdateItem() {
 		// Create the FormData object
 		const formData = new FormData();
 
-		/*
-		// Separate existing paths from new files
-		const existingPaths = vehicleImages
-			.filter(img => !img.file) // No file means it's already on the server
-			.map(img => img.path);    // Extract just the string path
-
-		const newFiles = vehicleImages
-			.filter(img => img.file); // These are the new ones from the input
-
-		// Append existing paths as a string/JSON so the DB knows to keep them
-		formData.append('existingImages', JSON.stringify(existingPaths));
-
-		// Append new files for Multer to process
-		newFiles.forEach((imgObj) => {
-			formData.append('images', imgObj.file);
-		});
-		*/
-
 		// 1. Append all text fields
 		Object.keys(vehicleData).forEach(key => {
 			formData.append(key, vehicleData[key]);
@@ -136,11 +118,12 @@ function UpdateItem() {
 
 		// 3. Send the request to the server
 		try {
-			const response = await fetch(`http://localhost:3000/api/vehicles/update/${vehicleData._id}`, {
+			const response = await fetch(`http://localhost:3000/api/vehicles/admin/update/${vehicleData._id}`, {
 				method: 'PUT',
 				// Note: DO NOT set 'Content-Type' header manually when using FormData. 
 				// The browser will automatically set it to 'multipart/form-data' with the correct boundary.
 				body: formData,
+				credentials: 'include'
 			});
 
 			if (response.ok) {

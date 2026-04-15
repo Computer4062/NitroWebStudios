@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { Carousel } from 'react-responsive-carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import NavBar from './components/navbar/NavBar'
@@ -7,7 +6,22 @@ import Footer from './components/footer/Footer'
 import Card from './components/card/Card'
 import "./home.css"
 
+// -------------------------------------------------------
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000");
+// -------------------------------------------------------
+
 function Home() {
+
+  // ----------------------------------------------------------------------------------------
+  useEffect(() => {
+    // This empty connection is enough to trigger the server's liveUserCount++
+    socket.on("connect", () => console.log("Connected to live tracker"));
+    
+    return () => socket.disconnect();
+  }, []);
+  // ----------------------------------------------------------------------------------------
 
   const [items, setItems] = useState([]);
 

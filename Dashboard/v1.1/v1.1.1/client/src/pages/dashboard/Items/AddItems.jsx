@@ -64,11 +64,12 @@ function AddItems() {
 
 		// 3. Send the request to the server
 		try {
-			const response = await fetch("http://localhost:3000/api/vehicles/addnew", {
+			const response = await fetch("http://localhost:3000/api/vehicles/admin/addnew", {
 				method: 'POST',
 				// Note: DO NOT set 'Content-Type' header manually when using FormData. 
 				// The browser will automatically set it to 'multipart/form-data' with the correct boundary.
 				body: formData,
+				credentials: 'include'
 			});
 
 			if (response.ok) {

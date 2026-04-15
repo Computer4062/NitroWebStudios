@@ -9,20 +9,25 @@ const __dirname = path.dirname(__filename);
  * @param {string} username - The name of the user (passed from the route)
  * @param {string} action - The description of the action
  */
-export const logger = (username, action) => {
-    // Navigate to your LOG file (assuming it's in the parent directory)
-    const logPath = path.join(__dirname, '..', 'LOG');
-    
-    // Ensure we have a string, default to Guest if null/undefined
-    const user = username || "N/A";
-    const dateTime = new Date().toLocaleString();
+function logger(username, action) {
+    try {
+        // 1. Ensure the log folder exists
+        const logPath = path.join(__dirname, '..', 'LOG');
+        
+        // 2. Safety check: Ensure strings for padding
+        const safeAction = (action || "Unknown Action").toString();
+        const user = (username || "N/A").toString();
+        const dateTime = new Date().toLocaleString();
 
-    // Format: Action (15 chars) | User (15 chars) | Date
-    const logEntry = `${action.padEnd(15)}\t${user.padEnd(15)}\t${dateTime}\n`;
+        const logEntry = `${safeAction.padEnd(15)}\t${user.padEnd(15)}\t${dateTime}\n`;
 
-    fs.appendFile(logPath, logEntry, (err) => {
-        if (err) {
-            console.error("Critical: Failed to write to log file:", err);
-        }
-    });
-};
+        // 3. Append to file
+        fs.appendFile(logPath, logEntry, (err) => {
+            if (err) console.error("Log Write Error:", err);
+        });
+    } catch (crash) {
+        console.error("The logger itself caused a crash:", crash);
+    }
+}
+
+export default logger;

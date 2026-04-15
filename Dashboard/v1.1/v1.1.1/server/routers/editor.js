@@ -1,6 +1,7 @@
 import { Octokit } from "octokit";
 import express from "express"
 import 'dotenv/config'
+import Logger from '../utils/Logger.js';
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 const REPO_OWNER = process.env.GITHUB_REPO_OWNER;
 const REPO_NAME = process.env.GITHUB_REPO_NAME;
 
-router.get('/github/tree', async (req, res) => {
+router.get('/admin/github/tree', async (req, res) => {
     console.log("Attempting to fetch tree for:", REPO_OWNER, REPO_NAME);
     try {
         const { data } = await octokit.rest.git.getTree({
@@ -28,7 +29,7 @@ router.get('/github/tree', async (req, res) => {
 });
 
 // Route to get file content
-router.get('/github/get-content', async (req, res) => {
+router.get('/admin/github/get-content', async (req, res) => {
     try {
         const { data } = await octokit.rest.repos.getContent({
             owner: REPO_OWNER,
@@ -45,7 +46,7 @@ router.get('/github/get-content', async (req, res) => {
 });
 
 // Route to push changes
-router.post('/github/push-changes', async (req, res) => {
+router.post('/admin/github/push-changes', async (req, res) => {
     try {
         const { path, content, message } = req.body;
 
@@ -67,7 +68,7 @@ router.post('/github/push-changes', async (req, res) => {
         });
 
         // 3. Log the action with your updated logger!
-        //logger("ADMIN", `EDITED_SITE_FILE: ${path}`);
+        Logger("ADMIN", `EDITED_SITE_FILE: ${path}`);
 
         res.json({ success: true });
     } catch (err) {

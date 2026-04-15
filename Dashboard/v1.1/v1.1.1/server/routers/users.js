@@ -14,7 +14,7 @@ import 'dotenv/config';
 import {Account} from '../models/users.js'
 
 import { verifyAdmin, verifyUser } from '../middleware/Authenciation.js';
-import { logger } from '../utils/Logger.js';
+import logger from '../utils/Logger.js';
 
 const router = express.Router();
 

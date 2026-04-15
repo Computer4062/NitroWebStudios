@@ -11,12 +11,20 @@ import accountRoutes from "./routers/users.js"
 import loggerRoutes from "./routers/logger.js"
 import databaseRouter from "./routers/database.js"
 import editorRouter from "./routers/editor.js"
-import analyticsRouter from "./routers/analytics.js"
+import trackerRouter from "./routers/tracker.js"
+
+import { verifyAdmin } from './middleware/Authenciation.js';
+
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { initSocket } from './utils/socket.js';
 
 // Code for setting up express app
 const PORT = process.env.PORT;
 const URI = process.env.MONGO_URI;
+
 const app = express()
+const httpServer = createServer(app);                                                  // For user tracking features
 
 app.use(cookieParser());
 app.use(cors({
@@ -31,12 +39,31 @@ app.use('/public/images', express.static('public/images'));
 app.use('/public/uploads', express.static('public/uploads'));
 app.set('etag', false);
 
+// For API calls that require admin access: Ex: updating inventory
+
+app.use("/api/vehicles/admin", verifyAdmin, vehicleRoutes)
+app.use("/api/accounts/admin", verifyAdmin, accountRoutes)
+app.use("/api/logs/admin", verifyAdmin, loggerRoutes)
+app.use("/api/database/admin", verifyAdmin, databaseRouter)
+app.use("/api/editor/admin", verifyAdmin, editorRouter)
+app.use("/api/analytics/admin", verifyAdmin, trackerRouter);
+
+// For API calls that does not require admin access
+
 app.use("/api/vehicles", vehicleRoutes)
 app.use("/api/accounts", accountRoutes)
 app.use("/api/logs", loggerRoutes)
 app.use("/api/database", databaseRouter)
 app.use("/api/editor", editorRouter)
-app.use("/api/analytics", analyticsRouter);
+app.use("/api/analytics", trackerRouter);
+
+// Initialize tracker functions
+
+const io = new Server(httpServer, {
+  cors: { origin: "http://localhost:5173" }
+});
+
+initSocket(io);
 
 // function to connect to Database
 async function connectToDB() {
@@ -51,6 +78,10 @@ async function connectToDB() {
 }
 
 connectToDB().then(() => {
+	httpServer.listen(3000, () => {
+	console.log("Server running on port 3000");
+	});
+
 	const server = app.listen(PORT, () => {
 		console.log(`Server listening on port ${PORT} 🚀`);
 	});
