@@ -24,7 +24,7 @@ const PORT = process.env.PORT;
 const URI = process.env.MONGO_URI;
 
 const app = express()
-const httpServer = createServer(app);                                                  // For user tracking features
+const httpServer = createServer(app);
 
 app.use(cookieParser());
 app.use(cors({
@@ -57,10 +57,10 @@ app.use("/api/database", databaseRouter)
 app.use("/api/editor", editorRouter)
 app.use("/api/analytics", trackerRouter);
 
-// Initialize tracker functions
+// Initialize socket.io for tracking purposes
 
 const io = new Server(httpServer, {
-  cors: { origin: "http://localhost:5173" }
+  cors: { origin: "*" }
 });
 
 initSocket(io);

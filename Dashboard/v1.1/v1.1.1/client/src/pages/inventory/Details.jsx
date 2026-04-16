@@ -6,9 +6,30 @@ import Footer from "../../components/footer/Footer.jsx"
 import Ticker from '../../components/Ticker/Ticker'
 import "./Details.css"
 
+// --------------------------------------------------------
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000");
+// --------------------------------------------------------
+
 function Details() {
-	const {id} = useParams();
 	const location = useLocation();
+
+	// -------------------------------------------------------- FOR TRACKING
+
+		useEffect(() => {
+			// location.pathname will correctly be "/inventory/12345" 
+			// when you navigate there.
+			const currentPath = location.pathname;
+			
+			socket.emit('page_view', { 
+			pagePath: currentPath 
+			});
+		}, [location]); // This ensures it fires every time the URL changes
+	// --------------------------------------------------------
+
+
+	const {id} = useParams();
 
   	const [activeImg, setActiveImg] = useState(0);
 	const [otherCardData, setOtherCardData] = useState([]);
@@ -25,7 +46,7 @@ function Details() {
       .catch((error) => {
         console.error("Error fetching data: ", error);
       });
-  }, []);
+  	}, []);
 
   // ... inside your component ...
 const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });

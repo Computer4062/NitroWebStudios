@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import NavBar from './components/navbar/NavBar'
@@ -15,12 +16,14 @@ const socket = io("http://localhost:3000");
 function Home() {
 
   // ----------------------------------------------------------------------------------------
+    const location = useLocation();
+
   useEffect(() => {
-    // This empty connection is enough to trigger the server's liveUserCount++
-    socket.on("connect", () => console.log("Connected to live tracker"));
-    
-    return () => socket.disconnect();
-  }, []);
+    // Fire the event to the server whenever the URL path changes
+    socket.emit('page_view', { 
+      pagePath: location.pathname 
+    });
+  }, [location]);
   // ----------------------------------------------------------------------------------------
 
   const [items, setItems] = useState([]);
