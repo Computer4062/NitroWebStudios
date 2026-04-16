@@ -14,7 +14,7 @@ function Card({item}){
             
             <div class="d-flex justify-content-between align-items-center mt-3">
               <span class="car-price">$89,990</span>
-              <Link to={`/inventory/${item._id}`} state={{car: item}} type="button" className="btn btn-view-details">View Details</Link>
+              <Link to={`/inventory/${item._id}`} type="button" className="btn btn-view-details">View Details</Link>
             </div>
           </div>
         </div>

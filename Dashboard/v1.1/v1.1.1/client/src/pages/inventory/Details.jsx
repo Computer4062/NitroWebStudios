@@ -13,7 +13,7 @@ const socket = io("http://localhost:3000");
 // --------------------------------------------------------
 
 function Details() {
-	const location = useLocation();
+	//const location = useLocation();
 
 	// -------------------------------------------------------- FOR TRACKING
 
@@ -34,11 +34,30 @@ function Details() {
   	const [activeImg, setActiveImg] = useState(0);
 	const [otherCardData, setOtherCardData] = useState([]);
 
-	let car = location.state.car;
-	let gallery = car.images;
+	//let car = location.state.car;
+	//let gallery = car.images;
 
+	const [vehicle, setVehicle] = useState([]);
+	const [gallery, setGallery] = useState([]);
+
+	// Get the specific car based off of the id assigned
 	useEffect(() => {
-    fetch(`http://localhost:3000/api/vehicles/find/type/${car.type}`)
+    fetch(`http://localhost:3000/api/vehicles/find/one/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setVehicle(data);
+		setGallery(data[0].images);
+      })
+      .catch((error) => {
+        console.error("Error fetching data: ", error);
+      });
+  	}, []);
+
+	console.log(vehicle);
+
+	// Get vehicles of similar type
+	useEffect(() => {
+    fetch(`http://localhost:3000/api/vehicles/find/type/${vehicle.type}`)
       .then((response) => response.json())
       .then((data) => {
         setOtherCardData(data);
@@ -68,9 +87,12 @@ const handleMouseMove = (e) => {
         <NavBar/>
       </section>
 
+	
 	<section className="bg-dark text-white py-5">
+	{vehicle.map((car) => (
 		<div className="container">
 			{/* 1. TOP SECTION: Model and Year */}
+			
 			<div className="mb-5">
 				<h1 className="display-4 fw-bold mb-0 text-uppercase tracking-wider">
 					{car.year} <span className="text-warning">{car.model}</span>
@@ -99,7 +121,7 @@ const handleMouseMove = (e) => {
 						style={{ cursor: isZoomed ? 'zoom-in' : 'pointer' }}
 					>
 						<img 
-						src={`http://localhost:3000/public/images/${gallery[activeImg]}`} 
+						src={`http://localhost:3000/public${gallery[activeImg]}`} 
 						className="img-fluid w-100 main-car-image" 
 						alt={car.model}
 						style={{ 
@@ -124,7 +146,7 @@ const handleMouseMove = (e) => {
 						{gallery.map((img, index) => (
 							<img 
 								key={index}
-								src={`http://localhost:3000/public/images/${img}`} 
+								src={`http://localhost:3000/public${img}`} 
 								className={`cursor-pointer border ${activeImg === index ? 'border-warning' : 'border-secondary'}`}
 								style={{ width: "100px", height: "70px", cursor: "pointer", objectFit: "cover", opacity: activeImg === index ? 1 : 0.6 }}
 								onClick={() => setActiveImg(index)}
@@ -181,6 +203,7 @@ const handleMouseMove = (e) => {
 				</div>
 			</div>
 		</div>
+		))}
 	</section>
 
 	{/* 5. SIMILAR OPTIONS SECTION */}
@@ -199,7 +222,7 @@ const handleMouseMove = (e) => {
 									</span>
 								)}
 								<img 
-									src={`http://localhost:3000/public/images/${item.images[0]}`} 
+									src={`http://localhost:3000/public${item.images[0]}`} 
 									className="card-img-top rounded-0 grayscale-filter-sm" 
 									alt={item.model} 
 									style={{ height: "180px", objectFit: "cover" }}

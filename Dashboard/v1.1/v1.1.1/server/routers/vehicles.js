@@ -59,7 +59,7 @@ router.get('/admin/drafts', async (req, res) => {
 
 // ------------------------------------------------------------------------------------------------- //
 // Find a specific vehicle
-router.get('/find/:id', async function(req, res) {
+router.get('/find/one/:id', async function(req, res) {
     try {
         const vehicleId = req.params.id;
 
@@ -71,7 +71,7 @@ router.get('/find/:id', async function(req, res) {
         }
 
         // Send the JSON back to the frontend
-        res.status(200).json(vehicle);
+        res.status(200).json([vehicle]);
 
     } catch (error) {
         console.error("Backend Error:", error);
