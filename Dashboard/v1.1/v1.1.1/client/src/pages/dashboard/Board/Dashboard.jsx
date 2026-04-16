@@ -5,37 +5,47 @@ import Nav from "../../../components/Dashboard/Nav.jsx";
 import "./Dashboard.css"
 
 const AnalyticsDashboard = () => {
-  // GET the live number of users in the site
-  const [liveCount, setLiveCount] = useState(0);
-
-  useEffect(() => {
-      const fetchLive = () => {
-          fetch('http://localhost:3000/api/analytics/admin/live-count',{
-            credentials: 'include'
-          })
-              .then(res => res.json())
-              .then(data => setLiveCount(data.activeUsers));
-      };
-
-      fetchLive();
-      const interval = setInterval(fetchLive, 5000); // Refresh every 5 seconds
-      return () => clearInterval(interval);
-  }, []);
-
   // Find the number of visitors per month seeing each product
   const [productStats, setProductStats] = useState([]);
+  const [isResetting, setIsResetting] = useState(false);  
 
-  // Fetch the data on mount
+  const fetchStats = async () => {
+      try {
+          const res = await fetch('http://localhost:3000/api/analytics/admin/top-products', {
+            credentials: 'include'
+          });
+          const data = await res.json();
+          setProductStats(data);
+      } catch (err) {
+          console.error("Fetch error:", err);
+      }
+  };
+
+  // To adjust product view counter to 0
+  const handleReset = async () => {
+      if (window.confirm("Are you sure? This will set all product view counts back to zero.")) {
+          setIsResetting(true);
+          try {
+              await fetch('http://localhost:3000/api/analytics/admin/reset-product-hits', { 
+                method: 'POST',
+                credentials: 'include'
+              });
+              // Refresh the local data after reset
+              await fetchStats(); 
+          } catch (err) {
+              alert("Reset failed");
+          } finally {
+              setIsResetting(false);
+          }
+      }
+  };
+
   useEffect(() => {
-      fetch('http://localhost:3000/api/analytics/admin/top-products', {
-        credentials: 'include'
-      })
-          .then(res => res.json())
-          .then(data => setProductStats(data))
-          .catch(err => console.error(err));
+      fetchStats();
   }, []);
 
-  console.log(productStats)
+  // For the traffic share bar
+  const totalHits = productStats.reduce((sum, item) => sum + item.hits, 0);
 
  return (
     <>
@@ -57,67 +67,64 @@ const AnalyticsDashboard = () => {
             </div>
           </div>
 
-        <div className="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
-          <div className="card-header bg-white py-3 border-bottom">
-              <div className="d-flex justify-content-between align-items-center">
-                  <h5 className="mb-0 fw-bold">Top Performing Products</h5>
-                  <span className="badge bg-primary-subtle text-primary rounded-pill">Monthly Hits</span>
+          <div className="card shadow-sm border-0 mt-4 rounded-4 overflow-hidden">
+              <div className="card-body p-4 border-bottom bg-light">
+                  <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                      <div>
+                          <h5 className="fw-bold mb-1">Product Traffic Analytics</h5>
+                          <p className="text-muted small mb-0">
+                              Tracking visits to product pages. Use the reset button to start a new weekly or monthly tracking cycle.
+                          </p>
+                      </div>
+                      <button 
+                          onClick={handleReset} 
+                          disabled={isResetting}
+                          className="btn btn-outline-danger btn-sm d-flex align-items-center gap-2 px-3"
+                      >
+                          {isResetting ? (
+                              <span className="spinner-border spinner-border-sm"></span>
+                          ) : (
+                              <i className="bi bi-arrow-counterclockwise"></i>
+                          )}
+                          {isResetting ? 'Resetting...' : 'Reset All Counts'}
+                      </button>
+                  </div>
+              </div>
+
+              <div className="table-responsive">
+                  <table className="table table-hover align-middle mb-0">
+                      {/* ... The <thead> and <tbody> from previous response ... */}
+                      <thead className="table-light">
+                          <tr>
+                              <th className="ps-4">Preview</th>
+                              <th>Product Name</th>
+                              <th className="text-center">Visits</th>
+                              <th className="text-end pe-4">Traffic Share</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {productStats.map((item, index) => (
+                              <tr key={index}>
+                                  <td className="ps-4">
+                                      <img src={`http://localhost:3000/public${item.image}`} className="rounded" style={{width: '40px', height: '40px', objectFit: 'cover'}} />
+                                  </td>
+                                  <td className="fw-medium">{item.name}</td>
+                                  <td className="text-center">
+                                      <span className="badge rounded-pill bg-primary">{item.hits}</span>
+                                  </td>
+                                  <td className="text-end pe-4">
+                                      <div className="progress" style={{height: '5px', width: '80px', marginLeft: 'auto'}}>
+                                          <div className="progress-bar bg-orange" style={{width: `${(item.hits / (totalHits)) * 100}%`}}></div>
+                                      </div>
+                                  </td>
+                              </tr>
+                          ))}
+                      </tbody>
+                  </table>
               </div>
           </div>
-          <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                  <thead className="table-light">
-                      <tr>
-                          <th className="ps-4" style={{ width: '80px' }}>Preview</th>
-                          <th>Product Details</th>
-                          <th className="text-center">Visits (This Month)</th>
-                          <th className="text-end pe-4">Trend</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {productStats.map((item, index) => (
-                          <tr key={index}>
-                              <td className="ps-4">
-                                  <img 
-                                      src={`http://localhost:3000/public${item.image}`} 
-                                      alt={item.name} 
-                                      className="rounded-3 border"
-                                      style={{ width: '48px', height: '48px', objectFit: 'cover' }}
-                                  />
-                              </td>
-                              <td>
-                                  <div className="fw-bold text-dark">{item.name}</div>
-                                  <small className="text-muted">ID: {item.path.split('/').pop()}</small>
-                              </td>
-                              <td className="text-center">
-                                  <span className="badge bg-dark rounded-pill px-3 py-2">
-                                      {item.hits.toLocaleString()}
-                                  </span>
-                              </td>
-                              <td className="text-end pe-4">
-                                  {/* Visual representation of popularity */}
-                                  <div className="progress" style={{ height: '6px', width: '100px', marginLeft: 'auto' }}>
-                                      <div 
-                                          className="progress-bar bg-orange" 
-                                          style={{ width: `${Math.min((item.hits / productStats.hits) * 100, 100)}%` }}
-                                      ></div>
-                                  </div>
-                              </td>
-                          </tr>
-                      ))}
-                      {productStats.length === 0 && (
-                          <tr>
-                              <td colSpan="4" className="text-center py-5 text-muted">
-                                  No product traffic recorded for this period.
-                              </td>
-                          </tr>
-                      )}
-                  </tbody>
-              </table>
-          </div>
-          </div>
 
-          <div className="d-flex flex-column gap-4">
+          <div className="d-flex flex-column gap-4 mt-4">
 
           {/* TOP CARD: Animated Orange Graph Section */}
             <div className="col-12">
@@ -146,7 +153,7 @@ const AnalyticsDashboard = () => {
               </div>
             </div>
             
-            {/* BOTTOM CARD: Live Counter */}
+            {/* BOTTOM CARD: Live Counter
             <div className="col-12">
               <div className="card shadow-sm border-0 py-5">
                 <div className="card-body text-center">
@@ -166,6 +173,7 @@ const AnalyticsDashboard = () => {
                 </div>
               </div>
             </div>
+             */}
 
           </div>
 

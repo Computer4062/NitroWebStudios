@@ -24,8 +24,6 @@ router.get('/admin/top-products', async (req, res) => {
             // Extract the ID (the part after /inventory/)
             const productId = visit.path.split('/inventory/');
 
-            console.log(productId[1]); 
-
             // Only proceed if it looks like a valid MongoDB ObjectId
             if (productId[1] && productId[1].length === 24) {
                 const product = await Vehicle.findById(productId[1]).select('model images');
@@ -50,14 +48,18 @@ router.get('/admin/top-products', async (req, res) => {
     }
 });
 
-router.get('/admin/top-pages', async (req, res) => {
-  try {
-    // Fetch top 15 pages sorted by highest hits
-    const stats = await PageVisit.find().sort({ hits: -1 }).limit(15);
-    res.json(stats);
-  } catch (err) {
-    res.status(500).json({ error: 'Server error fetching analytics' });
-  }
+// Add this to your analytics routes file
+router.post('/admin/reset-product-hits', async (req, res) => {
+    try {
+        // Only reset paths that start with /inventory/
+        await PageVisit.updateMany(
+            { path: { $regex: /^\/inventory\// } },
+            { $set: { hits: 0 } }
+        );
+        res.json({ message: "Product visit counts have been reset to 0." });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to reset counts" });
+    }
 });
 
 export default router;
