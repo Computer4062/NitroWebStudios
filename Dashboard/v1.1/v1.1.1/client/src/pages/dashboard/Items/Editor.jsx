@@ -118,7 +118,7 @@ function UpdateItem() {
 
 		// 3. Send the request to the server
 		try {
-			const response = await fetch(`http://localhost:3000/api/vehicles/admin/update/${vehicleData._id}`, {
+			const response = await fetch(`http://localhost:3000/api/stocks/admin/update/${vehicleData._id}`, {
 				method: 'PUT',
 				// Note: DO NOT set 'Content-Type' header manually when using FormData. 
 				// The browser will automatically set it to 'multipart/form-data' with the correct boundary.

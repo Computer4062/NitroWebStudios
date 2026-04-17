@@ -5,7 +5,7 @@ import "./Card.css"
 function Card({item}){
 	return(
       <div class="car-card h-100"  key={item._id}>
-          <img  src={`http://localhost:3000/public/images/${item.images[0]}`}  alt="Car Model" />
+          <img  src={`http://localhost:3000/public${item.images[0]}`}  alt="Car Model" />
           <div class="p-4">
             <div class="car-year">{item.year} Model</div>
             <div class="car-model">{item.name}</div>

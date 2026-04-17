@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import 'dotenv/config'
 
-import vehicleRoutes from "./routers/vehicles.js";
+import stockRoutes from "./routers/stocks.js";
 import accountRoutes from "./routers/users.js"
 import loggerRoutes from "./routers/logger.js"
 import databaseRouter from "./routers/database.js"
@@ -41,7 +41,7 @@ app.set('etag', false);
 
 // For API calls that require admin access: Ex: updating inventory
 
-app.use("/api/vehicles/admin", verifyAdmin, vehicleRoutes)
+app.use("/api/stocks/admin", verifyAdmin, stockRoutes)
 app.use("/api/accounts/admin", verifyAdmin, accountRoutes)
 app.use("/api/logs/admin", verifyAdmin, loggerRoutes)
 app.use("/api/database/admin", verifyAdmin, databaseRouter)
@@ -50,7 +50,7 @@ app.use("/api/analytics/admin", verifyAdmin, trackerRouter);
 
 // For API calls that does not require admin access
 
-app.use("/api/vehicles", vehicleRoutes)
+app.use("/api/stocks", stockRoutes)
 app.use("/api/accounts", accountRoutes)
 app.use("/api/logs", loggerRoutes)
 app.use("/api/database", databaseRouter)

@@ -1,7 +1,7 @@
 import express from 'express';
 import { getLiveCount } from '../utils/socket.js';
 import { PageVisit } from '../models/visits.js';
-import {Vehicle} from "../models/vehicles.js"
+import {Stock} from "../models/vehicles.js"
 
 const router = express.Router();
 
@@ -26,11 +26,11 @@ router.get('/admin/top-products', async (req, res) => {
 
             // Only proceed if it looks like a valid MongoDB ObjectId
             if (productId[1] && productId[1].length === 24) {
-                const product = await Vehicle.findById(productId[1]).select('model images');
+                const product = await Stock.findById(productId[1]).select('model images');                       // <-- Change these
 
                 if (product) {
                     return {
-                        name: product.model,
+                        name: product.model,                                                                    // <-- Change these
                         image: product.images[0],
                         hits: visit.hits,
                         path: visit.path

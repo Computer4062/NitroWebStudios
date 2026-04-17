@@ -42,7 +42,7 @@ function Details() {
 
 	// Get the specific car based off of the id assigned
 	useEffect(() => {
-    fetch(`http://localhost:3000/api/vehicles/find/one/${id}`)
+    fetch(`http://localhost:3000/api/stocks/find/one/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setVehicle(data);
@@ -53,11 +53,9 @@ function Details() {
       });
   	}, []);
 
-	console.log(vehicle);
-
 	// Get vehicles of similar type
 	useEffect(() => {
-    fetch(`http://localhost:3000/api/vehicles/find/type/${vehicle.type}`)
+    fetch(`http://localhost:3000/api/stocks/find/type/${vehicle.type}`)
       .then((response) => response.json())
       .then((data) => {
         setOtherCardData(data);

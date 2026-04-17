@@ -29,7 +29,7 @@ function Home() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/vehicles/all')
+    fetch('http://localhost:3000/api/stocks/all')
       .then((response) => response.json())
       .then((data) => {
         setItems(data);

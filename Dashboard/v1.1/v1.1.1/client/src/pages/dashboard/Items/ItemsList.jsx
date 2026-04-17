@@ -13,7 +13,7 @@ function ItemsList() {
 	const [searchQuery, setSearchQuery] = useState(""); // for search string
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/vehicles/all')
+    fetch('http://localhost:3000/api/stocks/all')
       .then((response) => response.json())
       .then((data) => {
 	  	setItems(data);
@@ -41,8 +41,9 @@ function ItemsList() {
 		if (!confirmDelete) return;
   
 		try {
-			const response = await fetch(`http://localhost:3000/api/vehicles/admin/delete/${id}`, {
+			const response = await fetch(`http://localhost:3000/api/stocks/admin/delete/${id}`, {
 				method: 'DELETE',
+				credentials: 'include'
 			});
   
 			if (response.ok) {

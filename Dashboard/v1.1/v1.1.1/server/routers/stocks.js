@@ -4,7 +4,7 @@ import multer from 'multer'
 import path from 'path'
 import { fileURLToPath } from 'url';
 
-import {Vehicle} from "../models/vehicles.js"
+import {Stock} from "../models/vehicles.js"
 
 import Logger from "../utils/Logger.js"
 
@@ -13,13 +13,23 @@ const router = express.Router();
 
 // Multer Configuration
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads/vehicles/'); // Make sure this folder exists!
-    },
-    filename: (req, file, cb) => {
-        // Creates a unique name: timestamp-originalname.jpg
-        cb(null, Date.now() + '-' + file.originalname);
-    }
+  destination: (req, file, cb) => {
+    cb(null, 'public/uploads/products/');
+  },
+  filename: (req, file, cb) => {
+    // 1. Get the file extension (e.g., .jpg)
+    const ext = path.extname(file.originalname);
+    
+    // 2. Create a "Short Unique" string:
+    // We take the current timestamp (last 6 digits) + a random 4-character string
+    const shortId = Math.random().toString(36).substring(2, 6);
+    const timestamp = Date.now().toString().slice(-6);
+    
+    // Result looks like: 882401-ax4z.jpg
+    const newName = `${timestamp}-${shortId}${ext}`;
+    
+    cb(null, newName);
+  }
 });
 
 const upload = multer({ 
@@ -32,46 +42,46 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ------------------------------------------------------------------------------------------------- //
-// GET all vehicles
+// GET all products
 router.get('/all', async (req, res) => {
     try {
-        const vehicle_data = await Vehicle.find({ draft: false });
-        res.status(200).json(vehicle_data);
+        const stock_data = await Stock.find({ draft: false });
+        res.status(200).json(stock_data);
 
     } catch (error) {
-        console.error("Error fetching vehicles:", error);
+        console.error("Error fetching stock:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
 // ------------------------------------------------------------------------------------------------- //
-// GET drafted vehicles (schedueled to be public later)
+// GET drafted stock (schedueled to be public later)
 router.get('/admin/drafts', async (req, res) => {
     try {
-        const vehicle_data = await Vehicle.find({ draft: true });
-        res.status(200).json(vehicle_data);
+        const stock_data = await Stock.find({ draft: true });
+        res.status(200).json(stock_data);
 
     } catch (error) {
-        console.error("Error fetching vehicles:", error);
+        console.error("Error fetching stock:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
 // ------------------------------------------------------------------------------------------------- //
-// Find a specific vehicle
+// Find a specific product
 router.get('/find/one/:id', async function(req, res) {
     try {
-        const vehicleId = req.params.id;
+        const productId = req.params.id;
 
         // Mongoose's findById handles the ObjectId conversion for you!
-        const vehicle = await Vehicle.findById(vehicleId);
+        const product = await Stock.findById(productId);
 
-        if (!vehicle) {
+        if (!product) {
             return res.status(404).json({ message: "Vehicle not found"});
         }
 
         // Send the JSON back to the frontend
-        res.status(200).json([vehicle]);
+        res.status(200).json([product]);
 
     } catch (error) {
         console.error("Backend Error:", error);
@@ -80,22 +90,22 @@ router.get('/find/one/:id', async function(req, res) {
 });
 
 // ------------------------------------------------------------------------------------------------- //
-// Find a vehicle depending on the type of vehicle searched for Ex: Sedan
+// Find a product depending on the type of product searched for Ex: Sedan, Cupcakes
 router.get('/find/type/:type', async function(req, res) {
     try {
-        const vehicleType = req.params.type;
+        const productType = req.params.type;
 
         // Mongoose's findById handles the ObjectId conversion for you!
-        let vehicles = await Vehicle.find({type: vehicleType});
+        let stocks = await Stock.find({type: productType});
 
-        if (!vehicles  || vehicles.length === 0) {
-            vehicles = await Vehicle.aggregate([    
+        if (!stocks  || stocks.length === 0) {
+            stocks = await Stock.aggregate([    
                 {$sample: {size: 5}}
             ])
         }
 
         // Send the JSON back to the frontend
-        res.status(200).json(vehicles);
+        res.status(200).json(stocks);
 
     } catch (error) {
         console.error("Backend Error:", error);
@@ -104,17 +114,17 @@ router.get('/find/type/:type', async function(req, res) {
 });
 
 // ------------------------------------------------------------------------------------------------- //
-// For adding a new vehicle to the database
+// For adding a new product to the Stock
 router.post('/admin/addnew', upload.array('images'), async (req, res) => {
     try {
         // Text data is in req.body
-        const { make, model, year, price, description, electric, featured, draft, type } = req.body;
+        const { make, model, year, price, description, electric, featured, draft, type } = req.body;                    // <-- Change this as use case
 
         // Image details are in req.files
         // We map them to get just the filenames/paths to save in the DB
-        const imagePaths = req.files.map(file => `/uploads/vehicles/${file.filename}`);
+        const imagePaths = req.files.map(file => `/uploads/products/${file.filename}`);
 
-        const newVehicle = new Vehicle({
+        const newProduct = new Stock({                                                                                 // <-- Change these as per use case
             make: make,
             model: model,
             year: Number(year),
@@ -127,9 +137,9 @@ router.post('/admin/addnew', upload.array('images'), async (req, res) => {
             type: type
         });
 
-        await newVehicle.save();
+        await newProduct.save();
         
-        res.status(201).json({ message: "Vehicle added successfully!", vehicle: newVehicle });
+        res.status(201).json({ message: "Product added successfully!"});
 
     } catch (error) {
         console.error("Backend Error:", error);
@@ -138,21 +148,21 @@ router.post('/admin/addnew', upload.array('images'), async (req, res) => {
 });
 
 // ------------------------------------------------------------------------------------------------- //
-// For updating list of vehicles in database
+// For updating list of products in database
 router.put('/admin/update/:id', upload.array('images'), async (req, res) => {
     const { id } = req.params;
 
     // Delete the old images
     // 1. Find the existing vehicle to get the OLD image paths
-        const existingVehicle = await Vehicle.findById(id);
+        const exsistingProduct = await Stock.findById(id);
         
-        if (!existingVehicle) {
-            return res.status(404).json({ message: "Vehicle not found" });
+        if (!exsistingProduct) {
+            return res.status(404).json({ message: "Product not found" });
         }
 
         // 2. Delete the old physical files from the 'public' folder
-        if (existingVehicle.images && existingVehicle.images.length > 0) {
-            existingVehicle.images.forEach(filePath => {
+        if (exsistingProduct.images && exsistingProduct.images.length > 0) {
+            exsistingProduct.images.forEach(filePath => {
                 // Construct absolute path: adjust 'public' based on your folder structure
                 const cleanPath = filePath.replace(/^\/+|;+/g, '');
                 const absolutePath = path.join(__dirname, '..', 'public', cleanPath);
@@ -170,26 +180,26 @@ router.put('/admin/update/:id', upload.array('images'), async (req, res) => {
 
     // Check if new images were uploaded
     if (req.files && req.files.length > 0) {
-        updateData.images = req.files.map(file => `/uploads/vehicles/${file.filename}`);
+        updateData.images = req.files.map(file => `/uploads/products/${file.filename}`);
     }
 
-    const updatedVehicle = await Vehicle.findByIdAndUpdate(id, updateData, { new: true });
-    res.json(updatedVehicle);
+    const updatedProduct = await Stock.findByIdAndUpdate(id, updateData, { new: true });
+    res.json(updatedProduct);
 });
 
 // ------------------------------------------------------------------------------------------------- //
-// Delete a vehicle listing
+// Delete a product listing
 router.delete('/admin/delete/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
-        // 1. Find the vehicle to get image paths before deleting the record
-        const vehicle = await Vehicle.findById(id);
-        if (!vehicle) return res.status(404).json({ message: "Item not found" });
+        // 1. Find the product to get image paths before deleting the record
+        const product = await Stock.findById(id);
+        if (!product) return res.status(404).json({ message: "Item not found" });
 
         // 2. Delete physical files from the server
-        if (vehicle.images && vehicle.images.length > 0) {
-            vehicle.images.forEach(filePath => {
+        if (product.images && product.images.length > 0) {
+            product.images.forEach(filePath => {
                 // Clean the path and join with root directory
                 const cleanPath = filePath.replace(/^\/+|;+/g, '');
                 const absolutePath = path.join(__dirname, '..', 'public', cleanPath);
@@ -201,10 +211,11 @@ router.delete('/admin/delete/:id', async (req, res) => {
         }
 
         // 3. Delete from Database
-        await Vehicle.findByIdAndDelete(id);
+        await Stock.findByIdAndDelete(id);
 
         res.status(200).json({ message: "Listing and associated images deleted successfully" });
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: error.message });
     }
 });

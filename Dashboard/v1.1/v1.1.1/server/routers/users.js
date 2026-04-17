@@ -13,7 +13,6 @@ import 'dotenv/config';
 
 import {Account} from '../models/users.js'
 
-import { verifyAdmin, verifyUser } from '../middleware/Authenciation.js';
 import logger from '../utils/Logger.js';
 
 const router = express.Router();
@@ -90,46 +89,6 @@ router.post('/login-step-2', async (req, res) => {
 
 // -----------------------------------------------------
 
-// Register a new user to the database
-router.post('/register', verifyUser, async(req, res) => {
-	try{
-		const {
-			username, password, email, admin,
-			first_name, last_name
-		} = req.body;
-
-		// check if user already exsists
-		const exsistingUser = await Account.findOne({username: username});
-
-		if (exsistingUser){
-			return res.status(400).json({code: 401, message: "Username already taken"});
-		}
-
-		// Hash the password
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
-
-		// Create and save new user with HASHED password
-		const newUser = {
-			username: username,
-			password: hashedPassword,
-			email: email,
-			admin: admin,
-			first_name: first_name,
-			last_name: last_name
-		};
-
-		await Account.create(newUser);
-		res.status(200).json({code: 201, message: "User registered successfully!"});
-
-	}catch(error){
-		console.error("Error fetching menu:", error);
-		res.status(500).json({code: 500, message: "Internal Server Error" });
-	}
-});
-
-// -----------------------------------------------------
-
 // Check cookies to see if user has logged in
 router.get('/check-auth', async(req, res) => {
 	// Check if 'token' cookie exsists
@@ -155,86 +114,6 @@ router.get('/check-auth', async(req, res) => {
 		console.error("JWT verfication failed: ", error.message);
 		return res.status(401).json({authenciated: false, message: "Invalid token"})
 	}
-});
-
-// -----------------------------------------------------
-
-// Find profile of a specific user
-router.get('/get-profile', async function(req, res) {
-	try {
-		// Get userID of user
-		const token = req.cookies.token;
-		const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-		const userId = decoded.userId;
-
-		// Mongoose's findById handles the ObjectId conversion for you!
-		const user = await Account.findById(userId);
-
-		if (!user) {
-			return res.status(404).json({ message: "user not found"});
-		}
-
-		// Send the JSON back to the frontend
-		res.status(200).json(user);
-
-	} catch (error) {
-		console.error("Backend Error:", error);
-		res.status(500).json({ message: "Server error: Check if the ID format is correct" });
-	}
-});
-
-// -----------------------------------------------------
-
-// For uploading a profile picture
-// Configure where to store the files
-// Use Memory Storage so we can process the image before saving to disk
-const storage = multer.memoryStorage();
-const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // Limit to 5MB for extra security
-});
-
-router.post('/upload-profile-pic', upload.single('profileImage'), async (req, res) => {
-    try {
-        if (!req.file) return res.status(400).send('No file uploaded.');
-        
-        // Grab the username from the FormData body
-        const username = req.body.username; 
-        
-        if (!username) {
-            return res.status(400).send('Username is required for naming the file.');
-        }
-
-        const filename = `${username}.jpg`;
-        const outputPath = path.join(__dirname, '../public/images/profiles/', filename);
-
-        // Process with Sharp to force JPG format
-        await sharp(req.file.buffer)
-            .resize(400, 400, { fit: 'cover' })
-            .toFormat('jpeg')
-            .toFile(outputPath);
-
-        // Update the database to reflect the filename (using username)
-	// CHANGE: Use findOneAndUpdate to target the 'username' field
-        const updatedUser = await Account.findOneAndUpdate(
-            { username: username }, // Search criteria
-            { profile_img: filename }, // Data to update
-            { new: true } // Return the updated document
-        );
-
-		if (!updatedUser) {
-            return res.status(404).json({ message: "User not found in database." });
-        }
-
-        res.status(200).json({ 
-            message: 'Success', 
-            filename: filename 
-        });
-
-    } catch (error) {
-        console.error("Upload Error:", error);
-        res.status(500).send("Error processing image.");
-    }
 });
 
 // -----------------------------------------------------
@@ -300,76 +179,6 @@ router.get('/verify-token', async (req, res) => {
         res.status(200).send("<h1>Email Verified Successfully!</h1><p>You can now log in.</p>");
     } catch (error) {
         res.status(500).json({ error: error.message });
-    }
-});
-
-// -----------------------------------------------------
-
-router.put('/update-profile', async (req, res) => {
-    try {
-        const { username, first_name, last_name, email, password } = req.body;
-
-        // Prepare the update object
-        let updateData = { first_name, last_name, email };
-
-        // Only update password if the user actually typed something new
-        if (password && password.trim() !== "") {
-            const salt = await bcrypt.genSalt(10);
-            updateData.password = await bcrypt.hash(password, salt);
-        }
-
-        const updatedUser = await Account.findOneAndUpdate(
-            { username: username },
-            { $set: updateData },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedUser) return res.status(404).json({ message: "User not found" });
-
-        res.status(200).json({ message: "Profile updated successfully" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error during update" });
-    }
-});
-
-// -----------------------------------------------------
-// Code for managing other accounts
-
-// Get all users for the management table
-// Backend: admin.js
-router.get('/users', async (req, res) => {
-    try {
-        // Added first_name and last_name to the selection
-        const users = await Account.find({}, 'username email admin technician profile_img first_name last_name');
-        res.json(users);
-    } catch (err) {
-        res.status(500).send("Error fetching users");
-    }
-});
-
-// Admin-only email update
-router.put('/update-email/:id', async (req, res) => {
-    try {
-        await Account.findByIdAndUpdate(req.params.id, { email: req.body.email });
-        res.status(200).json({ message: "Email updated successfully" });
-    } catch (err) {
-        res.status(500).send("Update failed");
-    }
-});
-
-// Admin-only delete account
-router.delete('/delete-user/:id', verifyAdmin, async (req, res) => {
-    try {
-        // Optional: Prevent admin from deleting themselves
-        if (req.params.id === req.userId) {
-            return res.status(400).json({ message: "You cannot delete your own admin account!" });
-        }
-        
-        await Account.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: "Account deleted" });
-    } catch (err) {
-        res.status(500).send("Delete failed");
     }
 });
 

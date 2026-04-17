@@ -21,4 +21,4 @@ const vehicleSchema = new mongoose.Schema({
 
 }, {collection: 'vehicles'});
 
-export const Vehicle = mongoose.models.dealership || mongoose.model('dealership', vehicleSchema);
+export const Stock = mongoose.models.dealership || mongoose.model('dealership', vehicleSchema);
