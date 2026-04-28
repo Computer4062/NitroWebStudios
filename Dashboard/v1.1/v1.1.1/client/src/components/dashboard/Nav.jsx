@@ -117,13 +117,30 @@ function Nav() {
                 <i className="bi bi-pencil-square"></i> Site Editor
               </a>
             </li>
-          
+          </ul>
+
+          {/* Accounts Section */}
+          <h6 className="sidebar-heading d-flex justify-content-between align-items-center px-4 mt-4 mb-2 text-muted text-uppercase small">
+            <span>Account Management</span>
+          </h6>
+          <ul className="nav flex-column px-3 gap-1">
+            {isAdmin && (
+              <li className="nav-item">
+                <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/accounts">
+                  <i className="bi bi-people"></i> Manage Accounts
+                </a>
+              </li>
+            )}
+            <li className="nav-item">
+              <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/profile">
+                <i className="bi bi-person-circle"></i> My Profile
+              </a>
+            </li>
             <li className="nav-item">
               <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/info">
                 <i className="bi bi-question-circle"></i> Info
               </a>
             </li>
-
             <li className="nav-item">
               <a className="nav-link d-flex align-items-center gap-2 text-danger" href="#" onClick={(e) => handleLogout()}>
                 <i className="bi bi-box-arrow-right"></i> Sign out
