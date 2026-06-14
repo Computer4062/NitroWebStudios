@@ -33,7 +33,6 @@ app.use(cors({
 	origin: ['http://localhost:5173', 'https://nitro-web-studios-themes.vercel.app', 'https://nitro-web-studios-themes-git-main-computer4062s-projects.vercel.app'],
 	credentials: true
 }));
-app.options('*', cors());
 app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
