@@ -3,6 +3,7 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import path from 'path'
+import { fileURLToPath } from 'url';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
 import 'dotenv/config'
