@@ -22,6 +22,10 @@ import { initSocket } from './utils/socket.js';
 
 import { PageVisit } from './models/visits.js';
 
+// For express.static
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Code for setting up express app
 const PORT = process.env.PORT;
 const URI = process.env.MONGO_URI;
