@@ -132,7 +132,7 @@ function Nav() {
             </li>
             <li className="nav-item">
               <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/mylistings">
-                <i className="bi bi-person-circle"></i> My Listings
+                <i className="bi bi-collection"></i> My Listings
               </a>
             </li>
             <li className="nav-item">

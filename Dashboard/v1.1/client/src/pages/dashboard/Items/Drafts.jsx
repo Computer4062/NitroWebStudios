@@ -79,7 +79,7 @@ function Drafts() {
 				<li className="breadcrumb-item small active" aria-current="page">Inventory</li>
 				</ol>
 			</nav>
-			<h1 className="h3 fw-bold text-dark">Vehicle Inventory</h1>
+			<h1 className="h3 fw-bold text-dark">Vehicle Inventory - Drafts</h1>
 			</div>
 			<div className="btn-toolbar mb-2 mb-md-0">
 			<Link to="/dashboard/items/editor" onClick={() => navigate('/dashboard/items/add')} className="btn btn-primary shadow-sm d-flex align-items-center gap-2">
