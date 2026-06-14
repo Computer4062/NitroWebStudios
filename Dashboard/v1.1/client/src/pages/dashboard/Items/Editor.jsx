@@ -1,8 +1,8 @@
 import {useState, useEffect} from "react"
 import { useLocation } from "react-router-dom";
 
-import Dash from "../../../components/Dashboard/Dash.jsx"
-import Nav from "../../../components/Dashboard/Nav.jsx"
+import Dash from "../../../components/dashboard/Dash.jsx"
+import Nav from "../../../components/dashboard/Nav.jsx"
 
 function UpdateItem() {
 	// Retrieve data about the vehicles from the list of vehicles

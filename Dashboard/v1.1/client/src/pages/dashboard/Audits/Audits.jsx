@@ -1,15 +1,15 @@
 import {useState, useEffect} from "react"
 import { Link } from 'react-router-dom';
 
-import Dash from "../../../components/Dashboard/Dash.jsx"
-import Nav from "../../../components/Dashboard/Nav.jsx"
+import Dash from "../../../components/dashboard/Dash.jsx"
+import Nav from "../../../components/dashboard/Nav.jsx"
 
 function Log() {
 	// For collecting the LOGS via backend API
 	const [logs, setLogs] = useState([]);
 
 	useEffect(() => {
-		fetch('http://localhost:3000/api/logs/logs')
+		fetch('https://nitroweb-studios-demo-site.onrender.com/api/user/logs/logs')
 			.then(res => res.json())
 			.then(data => setLogs(data))
 			.catch(err => console.error("Error fetching logs:", err));

@@ -1,7 +1,7 @@
 import {useState, useEffect} from "react"
 
-import Dash from "../../../components/Dashboard/Dash.jsx"
-import Nav from "../../../components/Dashboard/Nav.jsx"
+import Dash from "../../../components/dashboard/Dash.jsx"
+import Nav from "../../../components/dashboard/Nav.jsx"
 
 function AddItems() {
   	// Prepare vehicle data variables
