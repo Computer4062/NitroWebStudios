@@ -79,8 +79,8 @@ async function connectToDB() {
 }
 
 connectToDB().then(() => {
-	httpServer.listen(3000, () => {
-	console.log("Server running on port 3000");
+	httpServer.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`);
 	});
 
 	const server = app.listen(PORT, () => {
