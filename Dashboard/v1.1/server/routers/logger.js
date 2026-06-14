@@ -12,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // To fetch all log data
-router.get("/logs", (req, res) => {
+router.get("/user/logs", (req, res) => {
     const logPath = path.join(__dirname, '..', 'LOG');
 
     if (!fs.existsSync(logPath)) {

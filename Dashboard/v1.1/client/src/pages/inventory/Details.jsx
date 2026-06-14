@@ -18,7 +18,7 @@ if (!sessionId) {
 }
 
 // 2. Connect to your backend server, passing the session ID in the auth payload
-const socket = io("http://localhost:3000", {
+const socket = io("https://nitroweb-studios-demo-site.onrender.com", {
   auth: { sessionId }
 });
 // --------------------------------------------------------
@@ -57,7 +57,7 @@ function Details() {
 
 	// Get the specific car based off of the id assigned
 	useEffect(() => {
-    fetch(`http://localhost:3000/api/stocks/find/one/${id}`)
+    fetch(`https://nitroweb-studios-demo-site.onrender.com/api/stocks/find/one/${id}`)
       .then((response) => response.json())
       .then((data) => {
         setVehicle(data);
@@ -70,7 +70,7 @@ function Details() {
 
 	// Get vehicles of similar type
 	useEffect(() => {
-    fetch(`http://localhost:3000/api/stocks/find/type/${vehicle.type}`)
+    fetch(`https://nitroweb-studios-demo-site.onrender.com/api/stocks/find/type/${vehicle.type}`)
       .then((response) => response.json())
       .then((data) => {
         setOtherCardData(data);
@@ -134,7 +134,7 @@ const handleMouseMove = (e) => {
 						style={{ cursor: isZoomed ? 'zoom-in' : 'pointer' }}
 					>
 						<img 
-						src={`http://localhost:3000/public${gallery[activeImg]}`} 
+						src={`https://nitroweb-studios-demo-site.onrender.com/public${gallery[activeImg]}`} 
 						className="img-fluid w-100 main-car-image" 
 						alt={car.model}
 						style={{ 
@@ -159,7 +159,7 @@ const handleMouseMove = (e) => {
 						{gallery.map((img, index) => (
 							<img 
 								key={index}
-								src={`http://localhost:3000/public${img}`} 
+								src={`https://nitroweb-studios-demo-site.onrender.com/public${img}`} 
 								className={`cursor-pointer border ${activeImg === index ? 'border-warning' : 'border-secondary'}`}
 								style={{ width: "100px", height: "70px", cursor: "pointer", objectFit: "cover", opacity: activeImg === index ? 1 : 0.6 }}
 								onClick={() => setActiveImg(index)}
@@ -235,7 +235,7 @@ const handleMouseMove = (e) => {
 									</span>
 								)}
 								<img 
-									src={`http://localhost:3000/public${item.images[0]}`} 
+									src={`https://nitroweb-studios-demo-site.onrender.com/public${item.images[0]}`} 
 									className="card-img-top rounded-0 grayscale-filter-sm" 
 									alt={item.model} 
 									style={{ height: "180px", objectFit: "cover" }}

@@ -13,7 +13,7 @@ function Drafts() {
 	const [searchQuery, setSearchQuery] = useState(""); // for search string
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/stocks/admin/drafts',{
+    fetch('https://nitroweb-studios-demo-site.onrender.com/api/stocks/admin/drafts',{
 		credentials: 'include'
 	})
       .then((response) => response.json())
@@ -43,7 +43,7 @@ function Drafts() {
 		if (!confirmDelete) return;
   
 		try {
-			const response = await fetch(`http://localhost:3000/api/stocks/admin/delete/${id}`, {
+			const response = await fetch(`https://nitroweb-studios-demo-site.onrender.com/api/stocks/admin/delete/${id}`, {
 				method: 'DELETE',
 				credentials: 'include'
 			});
@@ -129,7 +129,7 @@ function Drafts() {
 					{/* Image Section: Aspect Ratio & Status Badge */}
 					<div className="col-4 position-relative">
 						<img 
-						src={`http://localhost:3000/public${item.images[0]}`}
+						src={`https://nitroweb-studios-demo-site.onrender.com/public${item.images[0]}`}
 						className="img-fluid rounded-start object-fit-cover h-100" 
 						alt={item.name}
 						style={{ minHeight: '160px' }}

@@ -8,7 +8,7 @@ function Database() {
 
 	const handleDownloadDatabase = async () => {
 		try {
-			const response = await fetch('http://localhost:3000/api/database/admin/download', {
+			const response = await fetch('https://nitroweb-studios-demo-site.onrender.com/api/database/admin/download', {
 				method: 'GET',
 				credentials: 'include',
 			});

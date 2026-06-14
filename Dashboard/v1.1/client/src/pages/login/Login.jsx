@@ -11,7 +11,7 @@ const Login = () => {
 		    setLoading(true); // 1. Start the spinn
 
 			try{
-				const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
+				const response = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/check-auth", {
 					method: 'GET',
 					credentials: 'include'
 				});
@@ -39,8 +39,8 @@ const Login = () => {
         e.preventDefault();
         
         const endpoint = step === 1 
-            ? "http://localhost:3000/api/accounts/login-step-1" 
-            : "http://localhost:3000/api/accounts/login-step-2";
+            ? "https://nitroweb-studios-demo-site.onrender.com/api/accounts/login-step-1" 
+            : "https://nitroweb-studios-demo-site.onrender.com/api/accounts/login-step-2";
 
         try {
             const response = await fetch(endpoint, {

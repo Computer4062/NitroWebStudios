@@ -42,11 +42,11 @@ app.set('etag', false);
 
 // For API calls that require admin/user access: Ex: updating inventory, updating profiles
 
-app.use("/api/stocks/admin", verifyAdmin, stockRoutes); 			app.use("/api/stocks/admin", verifyAdmin, stockRoutes);
-app.use("/api/accounts/admin", verifyAdmin, accountRoutes); 		app.use("/api/accounts/admin", verifyAdmin, accountRoutes)
-app.use("/api/logs/admin", verifyAdmin, loggerRoutes); 				app.use("/api/logs/admin", verifyAdmin, loggerRoutes)
-app.use("/api/database/admin", verifyAdmin, databaseRouter); 		app.use("/api/database/admin", verifyAdmin, databaseRouter)
-app.use("/api/editor/admin", verifyAdmin, editorRouter); 			app.use("/api/editor/admin", verifyUser, editorRouter)
+app.use("/api/stocks/admin", verifyAdmin, stockRoutes); 			app.use("/api/stocks/user", verifyUser, stockRoutes);
+app.use("/api/accounts/admin", verifyAdmin, accountRoutes); 		app.use("/api/accounts/user", verifyUser, accountRoutes)
+app.use("/api/logs/admin", verifyAdmin, loggerRoutes); 				app.use("/api/logs/user", verifyUser, loggerRoutes)
+app.use("/api/database/admin", verifyAdmin, databaseRouter); 		app.use("/api/database/user", verifyUser, databaseRouter)
+app.use("/api/editor/admin", verifyAdmin, editorRouter); 			app.use("/api/editor/user", verifyUser, editorRouter)
 app.use("/api/analytics/admin", verifyAdmin, trackerRouter); 		app.use("/api/analytics/user", verifyUser, trackerRouter);
 
 // For API calls that does not require admin access
@@ -91,5 +91,3 @@ connectToDB().then(() => {
 		client.close();
 	});
 });
-
-// This is a tricky comment

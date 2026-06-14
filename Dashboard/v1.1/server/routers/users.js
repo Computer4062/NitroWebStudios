@@ -366,7 +366,7 @@ router.put('/user/update-profile', async (req, res) => {
 
 // Get all users for the management table
 // Backend: admin.js
-router.get('/user/users', async (req, res) => {
+router.get('/admin/users', async (req, res) => {
     try {
         // Added first_name and last_name to the selection
         const users = await Account.find({}, 'username email admin profile_img first_name last_name');
