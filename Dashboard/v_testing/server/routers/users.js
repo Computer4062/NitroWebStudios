@@ -23,6 +23,16 @@ const __dirname = path.dirname(__filename);
 
 // get POSTED password and username and compare with that in database
 
+// For sending emails with transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',          // or remove this and use host/port below
+    family: 4,                 // 👈 Force IPv4
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
 // Route 1: Initial Login
 router.post('/login-step-1', async (req, res) => {
     const { username, password } = req.body;
@@ -277,22 +287,6 @@ router.post('/user/upload-profile-pic', upload.single('profileImage'), async (re
 // 	}
 // });
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com", // Or your respective SMTP host
-  port: 465,             // Or 587 if using STARTTLS
-  secure: true,          // Use true for 465, false for other ports
-  
-  // 🚀 THE FIXES FOR CLOUD HOSTING:
-  connectionTimeout: 10000, // Drops the connection after 10s instead of stalling for 2 minutes
-  tls: {
-    // Tells Node to prioritize standard IPv4 connections over cloud network pipes
-    dns_order: "ipv4first" 
-  },
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS // Your App Password string
-  }
-});
 
 // 2. ROUTE: Trigger/Send Verification Email
 router.post('/send-verification', async (req, res) => {
