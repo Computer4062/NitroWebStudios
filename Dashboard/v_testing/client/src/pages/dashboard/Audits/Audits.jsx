@@ -5,15 +5,85 @@ import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
 
 function Log() {
+	// For checking if user is an admin
+	const [isAdmin, setIsAdmin] = useState(false);
+
+	useEffect(() => {
+		const checkUserAuth = async() => {
+			try{
+				const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
+					method: 'GET',
+					credentials: 'include'
+				});
+
+				const data = await response.json();
+				setIsAdmin(data.admin);
+
+			} catch(error) {
+				console.log(error)
+			}
+		}
+
+		checkUserAuth();
+	}, []);
+
+
 	// For collecting the LOGS via backend API
 	const [logs, setLogs] = useState([]);
 
 	useEffect(() => {
-		fetch('http://localhost:3000/api/user/logs/logs')
+		fetch('http://localhost:3000/api/logs/user/logs', {
+			credentials: 'include',
+			method: 'GET'
+		})
 			.then(res => res.json())
 			.then(data => setLogs(data))
 			.catch(err => console.error("Error fetching logs:", err));
 	}, []);
+
+
+	// For clearing log entries
+	const [logEntries, setLogEntries] = useState(""); // Assuming you use a state like this to hold log text
+
+	const handleClearLogs = async () => {
+	// 1. Prevent accidental wipes with an urgent confirmation pop-up
+	const confirmWipe = window.confirm(
+		"CRITICAL WARNING:\n\nAre you sure you want to permanently clear all system activity logs? This action cannot be undone."
+	);
+	
+	if (!confirmWipe) return;
+
+	try {
+		// 2. Fire the DELETE request to your live Render API endpoint
+		const response = await fetch("http://localhost:3000/api/logs/admin/clear-logs", {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		// 🚀 Essential to pass your session tokens/cookies safely
+		credentials: "include" 
+		});
+
+		const data = await response.json();
+
+		if (response.ok) {
+		// 3. Inform the admin of a successful clean
+		alert(`Success: ${data.message || "System logs cleared."}`);
+		
+		// 4. Update frontend UI state instantly so the text screen resets
+		// We append a matching initialization line like the backend does
+		const timestamp = new Date().toISOString();
+		setLogEntries(`[${timestamp}] INFO: Log file cleared by Administrator.\n`);
+		
+		} else {
+		// Handles permission failures (e.g., 401 Unauthorized or 403 Forbidden)
+		alert(`Authorization Error: ${data.message || "You do not have permission to clear logs."}`);
+		}
+	} catch (error) {
+		console.error("Network fault while attempting to clear telemetry logs:", error);
+		alert("Network Error: Could not connect to the remote administration server.");
+	}
+	};
 
   return (
 	<>
@@ -27,9 +97,29 @@ function Log() {
 		<main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
 			<div className="container py-5">
 				{/* Header Section */}
-				<div className="mb-4">
-					<h1 className="h3 fw-bold text-dark">Logs</h1>
-					<p className="text-muted">All changes that are done to the site is traced here for better readability</p>
+				<div className="row align-items-center justify-content-between gy-3 mb-4">
+					
+					{/* Text Content Section */}
+					<div className="col-12 col-md-8 text-start">
+					<h1 className="h3 fw-bold text-dark mb-1">Logs</h1>
+					<p className="text-muted mb-0">
+						All changes that are done to the site is traced here for better readability
+					</p>
+					</div>
+
+					{/* Button Wrapper Section */}
+					{isAdmin && (
+					<div className="col-12 col-md-4 d-flex justify-content-start justify-content-md-end">
+					<button 
+						onClick={handleClearLogs} 
+						className="btn btn-outline-danger d-flex align-items-center justify-content-center gap-2 w-100 w-md-auto py-2 px-3"
+					>
+						<i className="bi bi-trash3"></i>
+						<span>Clear System Logs</span>
+					</button>
+					</div>
+					)}
+
 				</div>
 
 				{/* LOGS TABLE */}

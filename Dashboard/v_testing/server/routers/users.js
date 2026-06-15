@@ -144,6 +144,8 @@ router.post('/admin/register', verifyUser, async(req, res) => {
 		};
 
 		await Account.create(newUser);
+
+        logger(username, `USER REGISTERED ${username} | ADMIN: ${admin}`);
 		res.status(200).json({code: 201, message: "User registered successfully!"});
 
 	}catch(error){
@@ -391,7 +393,7 @@ router.put('/user/update-profile', async (req, res) => {
 
 // Get all users for the management table
 // Backend: admin.js
-router.get('/admin/users', async (req, res) => {
+router.get('/user/users', async (req, res) => {
     try {
         // Added first_name and last_name to the selection
         const users = await Account.find({}, 'username email admin profile_img first_name last_name');

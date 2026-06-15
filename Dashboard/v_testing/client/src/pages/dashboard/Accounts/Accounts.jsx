@@ -13,7 +13,7 @@ function Accounts() {
 	}, []);
 
 	const fetchUsers = async () => {
-	const res = await fetch("http://localhost:3000/api/accounts/admin/users", { credentials: 'include' });
+	const res = await fetch("http://localhost:3000/api/accounts/user/users", { credentials: 'include' });
 	const data = await res.json();
 	setUsers(data);
 	};

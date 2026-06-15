@@ -43,7 +43,6 @@ function ItemsList() {
           const authData = await authRes.json();
           // Assuming backend returns an object with a user sub-property (e.g., { user: { _id: "...", username: "..." } })
           setCurrentUser(authData.name);
-		  console.log(currentUser);
         }
 
         // B. Fetch all registered user profiles (for the card footers)
@@ -61,7 +60,7 @@ function ItemsList() {
         });
 		const userAdminData = await usersAdmin.json();
       	setIsAdmin(userAdminData.admin);
-		console.log(isAdmin);
+		console.log(userAdminData);
 
       } catch (error) {
         console.error("Error loading dashboard telemetry:", error);
