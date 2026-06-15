@@ -24,12 +24,17 @@ const __dirname = path.dirname(__filename);
 // get POSTED password and username and compare with that in database
 // For sending emails with transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail',          // or remove this and use host/port below
-    family: 4,                 // 👈 Force IPv4
+    host: 'smtp.gmail.com',
+    port: 587,          // 👈 Switch to 587 (STARTTLS)
+    secure: false,      // false for 587 (upgrades via STARTTLS)
+    family: 4,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
+    tls: {
+        rejectUnauthorized: false  // helps with some cloud environments
+    }
 });
 
 // Route 1: Initial Login

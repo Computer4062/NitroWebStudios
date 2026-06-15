@@ -33,6 +33,20 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+// const transporter = nodemailer.createTransport({
+//     host: 'smtp.gmail.com',
+//     port: 587,          // 👈 Switch to 587 (STARTTLS)
+//     secure: false,      // false for 587 (upgrades via STARTTLS)
+//     family: 4,
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//     },
+//     tls: {
+//         rejectUnauthorized: false  // helps with some cloud environments
+//     }
+// });
+
 // Route 1: Initial Login
 router.post('/login-step-1', async (req, res) => {
     const { username, password } = req.body;
