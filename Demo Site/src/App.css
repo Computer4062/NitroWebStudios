@@ -1,0 +1,6 @@
+/* App-level styling kept minimal; index.css holds globals */
+.App {
+    background: #000000;
+    min-height: 100vh;
+    color: #ffffff;
+}

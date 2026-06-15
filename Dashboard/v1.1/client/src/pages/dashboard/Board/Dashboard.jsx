@@ -13,7 +13,7 @@ const AnalyticsDashboard = () => {
 
 // 1. Fetch the exact JSON dataset payload layout
   useEffect(() => {
-    fetch("https://nitroweb-studios-demo-site.onrender.com/api/analytics/user/top-products", {
+    fetch("http://localhost:3000/api/analytics/user/top-products", {
 				method: 'GET',
 				credentials: 'include'
     }) 
@@ -184,7 +184,7 @@ const AnalyticsDashboard = () => {
                         <div className="bg-light d-flex align-items-center justify-content-center overflow-hidden rounded-top-3" style={{ height: '120px' }}>
                           {itemImageSrc ? (
                             <img 
-                              src={`https://nitroweb-studios-demo-site.onrender.com/public${itemImageSrc}`} 
+                              src={`http://localhost:3000/public${itemImageSrc}`} 
                               alt={item.name} 
                               className="w-100 h-100 object-fit-cover"
                             />

@@ -10,7 +10,7 @@ function Profile() {
     useEffect(() => {
 	const GetProfile = async() => {
 		try{
-			const response = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/user/get-profile", {
+			const response = await fetch("http://localhost:3000/api/accounts/user/get-profile", {
 				method: 'GET',
 				credentials: 'include'
 			});
@@ -62,7 +62,7 @@ function Profile() {
 
     setUploading(true);
     try {
-      const response = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/user/upload-profile-pic", {
+      const response = await fetch("http://localhost:3000/api/accounts/user/upload-profile-pic", {
         method: 'POST',
         body: formData,
         credentials: 'include'
@@ -86,7 +86,7 @@ function Profile() {
 
   const handleUpdateProfile = async () => {
     try {
-      const response = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/admin/update-profile", {
+      const response = await fetch("http://localhost:3000/api/accounts/admin/update-profile", {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -112,7 +112,7 @@ function Profile() {
 
   const handleDeleteProfile = async () => {
     try {
-      const response = await fetch(`https://nitroweb-studios-demo-site.onrender.com/api/accounts/user/delete-self/${profile._id}`, {
+      const response = await fetch(`http://localhost:3000/api/accounts/user/delete-self/${profile._id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -146,7 +146,7 @@ function Profile() {
               <div class="card border-0 shadow-sm text-center p-4">
                 <div class="mb-3">
                   <img 
-                    src={`https://nitroweb-studios-demo-site.onrender.com/public/uploads/profiles/${profile.profile_img}`} 
+                    src={`http://localhost:3000/public/uploads/profiles/${profile.profile_img}`} 
                     class="rounded-circle img-thumbnail shadow-sm" 
                     alt="Profile" 
                     style={{ width: '150px', height: '150px', objectFit: 'cover' }}

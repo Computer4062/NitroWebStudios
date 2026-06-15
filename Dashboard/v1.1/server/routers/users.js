@@ -22,20 +22,30 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // get POSTED password and username and compare with that in database
+
 // For sending emails with transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,          // 👈 Switch to 587 (STARTTLS)
-    secure: false,      // false for 587 (upgrades via STARTTLS)
-    family: 4,
+    service: 'gmail',          // or remove this and use host/port below
+    family: 4,                 // 👈 Force IPv4
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
-    tls: {
-        rejectUnauthorized: false  // helps with some cloud environments
-    }
 });
+
+// const transporter = nodemailer.createTransport({
+//     host: 'smtp.gmail.com',
+//     port: 587,          // 👈 Switch to 587 (STARTTLS)
+//     secure: false,      // false for 587 (upgrades via STARTTLS)
+//     family: 4,
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//     },
+//     tls: {
+//         rejectUnauthorized: false  // helps with some cloud environments
+//     }
+// });
 
 // Route 1: Initial Login
 router.post('/login-step-1', async (req, res) => {
@@ -49,7 +59,6 @@ router.post('/login-step-1', async (req, res) => {
 
     // 2. Generate a 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(code)
     
     // 3. Save code to user doc temporarily
     user.verificationToken = code;
@@ -135,6 +144,8 @@ router.post('/admin/register', verifyUser, async(req, res) => {
 		};
 
 		await Account.create(newUser);
+
+        logger(username, `USER REGISTERED ${username} | ADMIN: ${admin}`);
 		res.status(200).json({code: 201, message: "User registered successfully!"});
 
 	}catch(error){
@@ -283,6 +294,15 @@ router.post('/user/upload-profile-pic', upload.single('profileImage'), async (re
 // -----------------------------------------------------
 
 // For email verification
+// 1. Setup Email Transporter (Use Gmail or an SMTP service)
+// const transporter = nodemailer.createTransport({
+// 	service: 'gmail',
+// 	auth: {
+// 		user: process.env.EMAIL_USER,
+// 		pass: process.env.EMAIL_PASS
+// 	}
+// });
+
 
 // 2. ROUTE: Trigger/Send Verification Email
 router.post('/send-verification', async (req, res) => {
@@ -373,7 +393,7 @@ router.put('/user/update-profile', async (req, res) => {
 
 // Get all users for the management table
 // Backend: admin.js
-router.get('/admin/users', async (req, res) => {
+router.get('/user/users', async (req, res) => {
     try {
         // Added first_name and last_name to the selection
         const users = await Account.find({}, 'username email admin profile_img first_name last_name');

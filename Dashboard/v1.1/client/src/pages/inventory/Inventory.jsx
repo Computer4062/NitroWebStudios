@@ -13,7 +13,7 @@ function Menu() {
   const [filteredItems, setFilteredItems] = useState([]);
 
   useEffect(() => {
-    fetch('https://nitroweb-studios-demo-site.onrender.com/api/stocks/all')
+    fetch('http://localhost:3000/api/stocks/all')
       .then((response) => response.json())
       .then((data) => {
         setItems(data);

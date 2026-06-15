@@ -9,7 +9,7 @@ export default function AdminGuard({ children }) {
   useEffect(() => {
     const verifyAdminStatus = async () => {
       try {
-        const res = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/check-auth", {
+        const res = await fetch("http://localhost:3000/api/accounts/check-auth", {
           credentials: 'include', // Sends cookies/session flags along with the request
         });
 

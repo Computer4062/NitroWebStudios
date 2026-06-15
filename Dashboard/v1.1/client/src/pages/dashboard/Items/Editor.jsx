@@ -17,7 +17,7 @@ function UpdateItem() {
 	const convertPathToBlob = async (serverPath) => {                                                 // Convert server URL's to Blob URL's
 		try {
 			// 1. Build the full URL to your backend
-			const fullUrl = `https://nitroweb-studios-demo-site.onrender.com/public${serverPath}`;
+			const fullUrl = `http://localhost:3000/public${serverPath}`;
 
 			// 2. Fetch the image data
 			const response = await fetch(fullUrl);
@@ -42,7 +42,7 @@ function UpdateItem() {
 
 			for (const path of vehicleData.images) {
 				// 1. Get the raw Blob data
-				const fullUrl = `https://nitroweb-studios-demo-site.onrender.com/public${path}`;
+				const fullUrl = `http://localhost:3000/public${path}`;
 				const response = await fetch(fullUrl);
 				const imageBlob = await response.blob();
 
@@ -118,7 +118,7 @@ function UpdateItem() {
 
 		// 3. Send the request to the server
 		try {
-			const response = await fetch(`https://nitroweb-studios-demo-site.onrender.com/api/stocks/admin/update/${vehicleData._id}`, {
+			const response = await fetch(`http://localhost:3000/api/stocks/admin/update/${vehicleData._id}`, {
 				method: 'PUT',
 				// Note: DO NOT set 'Content-Type' header manually when using FormData. 
 				// The browser will automatically set it to 'multipart/form-data' with the correct boundary.

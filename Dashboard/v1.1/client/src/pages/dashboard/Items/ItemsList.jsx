@@ -16,7 +16,7 @@ function ItemsList() {
 	const [isAdmin, setIsAdmin] = useState();
 
   useEffect(() => {
-    fetch('https://nitroweb-studios-demo-site.onrender.com/api/stocks/all')
+    fetch('http://localhost:3000/api/stocks/all')
       .then((response) => response.json())
       .then((data) => {
 	  	setItems(data);
@@ -31,7 +31,7 @@ function ItemsList() {
     const loadDashboardData = async () => {
       try {
         // A. Verify active authentication and get current logged-in user details
-        const authRes = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/check-username", {
+        const authRes = await fetch("http://localhost:3000/api/accounts/check-username", {
           credentials: 'include',
 		  method: 'GET'
         });
@@ -43,11 +43,10 @@ function ItemsList() {
           const authData = await authRes.json();
           // Assuming backend returns an object with a user sub-property (e.g., { user: { _id: "...", username: "..." } })
           setCurrentUser(authData.name);
-		  console.log(currentUser);
         }
 
         // B. Fetch all registered user profiles (for the card footers)
-        const usersRes = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/user/users", { 
+        const usersRes = await fetch("http://localhost:3000/api/accounts/user/users", { 
           credentials: 'include',
 		  method: 'GET'
         });
@@ -55,13 +54,13 @@ function ItemsList() {
         setUsers(usersData);
 
 		// Check if user is an admin
-		const usersAdmin = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/check-auth", { 
+		const usersAdmin = await fetch("http://localhost:3000/api/accounts/check-auth", { 
           credentials: 'include',
 		  method: 'GET'
         });
 		const userAdminData = await usersAdmin.json();
       	setIsAdmin(userAdminData.admin);
-		console.log(isAdmin);
+		console.log(userAdminData);
 
       } catch (error) {
         console.error("Error loading dashboard telemetry:", error);
@@ -89,7 +88,7 @@ function ItemsList() {
 		if (!confirmDelete) return;
   
 		try {
-			const response = await fetch(`https://nitroweb-studios-demo-site.onrender.com/api/stocks/admin/delete/${id}`, {
+			const response = await fetch(`http://localhost:3000/api/stocks/admin/delete/${id}`, {
 				method: 'DELETE',
 				credentials: 'include'
 			});
@@ -194,7 +193,7 @@ function ItemsList() {
 							{/* Image Section */}
 							<div className="col-4 position-relative">
 							<img 
-								src={`https://nitroweb-studios-demo-site.onrender.com/public${item.images && item.images ? item.images : ''}`}
+								src={`http://localhost:3000/public${item.images && item.images ? item.images : ''}`}
 								className="img-fluid object-fit-cover h-100 w-100" 
 								alt={item.model || 'Vehicle'}
 								style={{ minHeight: '160px' }}
@@ -270,11 +269,11 @@ function ItemsList() {
 						<div className="card-footer bg-light-subtle border-top border-light p-3 d-flex align-items-center gap-2">
 							<div style={{ width: '32px', height: '32px' }} className="rounded-circle overflow-hidden shadow-sm bg-secondary-subtle d-flex align-items-center justify-content-center">
 							<img 
-								src={`https://nitroweb-studios-demo-site.onrender.com/public/uploads/profiles/${profileImage}`}
+								src={`http://localhost:3000/public/uploads/profiles/${profileImage}`}
 								alt={displayName} 
 								className="w-100 h-100 object-fit-cover"
 								onError={(e) => {
-								e.currentTarget.src = "https://nitroweb-studios-demo-site.onrender.com/public/uploads/profiles/default.jpg";
+								e.currentTarget.src = "http://localhost:3000/public/uploads/profiles/default.jpg";
 								}}
 							/>
 							</div>

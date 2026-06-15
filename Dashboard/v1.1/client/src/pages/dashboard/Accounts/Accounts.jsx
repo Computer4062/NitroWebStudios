@@ -13,7 +13,7 @@ function Accounts() {
 	}, []);
 
 	const fetchUsers = async () => {
-	const res = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/admin/users", { credentials: 'include' });
+	const res = await fetch("http://localhost:3000/api/accounts/user/users", { credentials: 'include' });
 	const data = await res.json();
 	setUsers(data);
 	};
@@ -30,7 +30,7 @@ function Accounts() {
 	// Function to update email from the card
 	const handleCardEmailUpdate = async () => {
 		try {
-			const response = await fetch(`https://nitroweb-studios-demo-site.onrender.com/api/admin/update-email/${selectedUser._id}`, {
+			const response = await fetch(`http://localhost:3000/api/admin/update-email/${selectedUser._id}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ email: editedEmail }),
@@ -50,7 +50,7 @@ function Accounts() {
 	// Function for deleting exsisting accounts
 	const handleDeleteUser = async (id, username) => {
 	if (window.confirm(`Are you sure you want to delete ${username}?`)) {
-		await fetch(`https://nitroweb-studios-demo-site.onrender.com/api/accounts/admin/delete-user/${id}`, { 
+		await fetch(`http://localhost:3000/api/accounts/admin/delete-user/${id}`, { 
 			method: 'DELETE', 
 			credentials: 'include' 
 		});
@@ -72,7 +72,7 @@ function Accounts() {
 		setLoading(true); // 1. Start the spinn
 
 		try {
-			const response = await fetch("https://nitroweb-studios-demo-site.onrender.com/api/accounts/admin/register", {
+			const response = await fetch("http://localhost:3000/api/accounts/admin/register", {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(newUser),
@@ -257,7 +257,7 @@ function Accounts() {
 							{/* Also removed border-start which looked bad on mobile */}
 							<div className="col-12 col-md-4 text-center order-1 order-md-2 border-md-start"> 
 								<img 
-									src={`https://nitroweb-studios-demo-site.onrender.com/public/uploads/profiles/${selectedUser.profile_img}`} 
+									src={`http://localhost:3000/public/uploads/profiles/${selectedUser.profile_img}`} 
 									className="rounded-circle img-thumbnail shadow-sm mb-3 mb-md-2" /* Adjusted margin */
 									style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
 									alt="Profile"
@@ -293,7 +293,7 @@ function Accounts() {
 								<tr key={user._id}>
 									<td>
 										<div class="d-flex align-items-center">
-											<img src={`https://nitroweb-studios-demo-site.onrender.com/public/uploads/profiles/${user.profile_img}`} class="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
+											<img src={`http://localhost:3000/public/uploads/profiles/${user.profile_img}`} class="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
 											<span class="fw-bold text-dark">{user.username}</span>
 										</div>
 									</td>
