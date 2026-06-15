@@ -1,0 +1,61 @@
+
+
+    /* Spacing for the Card Grid */
+    .inventory-grid {
+      /* g-4 provides a 1.5rem gap between columns and rows */
+      --bs-gutter-x: 2rem;
+      --bs-gutter-y: 2.5rem;
+	}
+
+				/* Sidebar Container */
+.filter-section {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  padding: 20px;
+}
+
+/* Header & Labels */
+.filter-label-main {
+  color: #ffc107; /* Orange-Yellow */
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.sub-section-text {
+  color: #ffffff !important;
+  font-size: 0.95rem;
+}
+
+/* Rectangular Inputs */
+.form-control-custom, .form-select-custom {
+  border-radius: 0 !important;
+  background-color: #000 !important;
+  border: 1px solid #444 !important;
+  color: white !important;
+}
+
+.filter-group {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+/* Ensure the menu stays visible on desktop even if it was collapsed on mobile */
+@media (min-width: 768px) {
+  #mobileFilterMenu.collapse:not(.show) {
+    display: block !important;
+  }
+}
+
+/* Optional: Add a subtle border to the mobile section when expanded */
+@media (max-width: 767.98px) {
+  .filter-section {
+    border: 1px solid #ffc107;
+    padding: 15px;
+    background-color: #111;
+  }
+}
