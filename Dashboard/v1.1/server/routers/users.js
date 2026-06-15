@@ -49,6 +49,7 @@ router.post('/login-step-1', async (req, res) => {
 
     // 2. Generate a 6-digit code
     const code = Math.floor(100000 + Math.random() * 900000).toString();
+    console.log(code)
     
     // 3. Save code to user doc temporarily
     user.verificationToken = code;
