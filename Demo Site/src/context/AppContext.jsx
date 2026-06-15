@@ -27,31 +27,33 @@ export function AppProvider({ children }) {
     localStorage.setItem("dcd_curr", currency);
   }, [currency]);
 
-  const t = (key) => {
-    const dict = translations[language] || translations.en;
-    return dict[key] ?? translations.en[key] ?? key;
-  };
-
-  const formatPrice = (omrValue) => {
-    if (omrValue == null) return "—";
-    if (currency === "USD") {
-      const usd = Math.round(omrValue * OMR_TO_USD);
-      return `$${usd.toLocaleString("en-US")}`;
-    }
-    const prefix = language === "ar" ? "ر.ع. " : "OMR ";
-    return `${prefix}${Math.round(omrValue).toLocaleString("en-US")}`;
-  };
-
   const value = useMemo(
-    () => ({
-      language,
-      setLanguage,
-      currency,
-      setCurrency,
-      t,
-      formatPrice,
-      isRTL: language === "ar",
-    }),
+    () => {
+      const t = (key) => {
+        const dict = translations[language] || translations.en;
+        return dict[key] ?? translations.en[key] ?? key;
+      };
+
+      const formatPrice = (omrValue) => {
+        if (omrValue == null) return "—";
+        if (currency === "USD") {
+          const usd = Math.round(omrValue * OMR_TO_USD);
+          return `$${usd.toLocaleString("en-US")}`;
+        }
+        const prefix = language === "ar" ? "ر.ع. " : "OMR ";
+        return `${prefix}${Math.round(omrValue).toLocaleString("en-US")}`;
+      };
+
+      return {
+        language,
+        setLanguage,
+        currency,
+        setCurrency,
+        t,
+        formatPrice,
+        isRTL: language === "ar",
+      };
+    },
     [language, currency]
   );
 
