@@ -231,7 +231,6 @@ const Home = () => {
             <SocialIcon icon={Send} label="Telegram" testid="social-telegram" />
             <SocialIcon icon={Instagram} label="Instagram" testid="social-instagram" />
             <SocialIcon icon={Youtube} label="YouTube" testid="social-youtube" />
-            <SocialIcon icon={TikTokIcon} label="TikTok" testid="social-tiktok" />
           </div>
         </div>
       </section>
