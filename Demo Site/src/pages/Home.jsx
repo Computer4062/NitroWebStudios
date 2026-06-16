@@ -41,46 +41,94 @@ const Home = () => {
     el.scrollBy({ left: dir === "next" ? w : -w, behavior: "smooth" });
   };
 
+    const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % 4);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="bg-black text-white">
       {/* HERO */}
       <section
         data-testid="home-hero"
-        className="relative min-h-[100vh] flex items-center justify-center overflow-hidden"
+        className="relative min-h-[100vh] flex items-center justify-center overflow-hidden bg-black"
       >
-        <img
-          src="https://images.unsplash.com/photo-1611821064430-0d40291922d2?auto=format&fit=crop&w=2000&q=80"
-          alt="Hero vehicle"
-          className="absolute inset-0 w-full h-full object-cover full-mono opacity-50"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black" />
+        {/* Carousel slides */}
+        {[
+          "https://images.pexels.com/photos/3802510/pexels-photo-3802510.jpeg?auto=compress&cs=tinysrgb&w=1600",
+          "https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=1600",
+          "https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg?auto=compress&cs=tinysrgb&w=1600",
+          "https://images.pexels.com/photos/1592384/pexels-photo-1592384.jpeg?auto=compress&cs=tinysrgb&w=1600",
+        ].map((src, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-[1200ms] ease-in-out ${
+              activeSlide === i ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={src}
+              alt={`Hero slide ${i + 1}`}
+              className="w-full h-full object-cover grayscale brightness-[0.45]"
+            />
+          </div>
+        ))}
 
-        <div className="relative z-10 text-center px-6 max-w-5xl fade-up">
-          <p className="font-display text-[11px] tracking-[0.5em] uppercase text-white/70 mb-8">
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/85" />
+
+        {/* Content */}
+        <div className="relative z-10 text-center px-6 max-w-4xl fade-up">
+          <p className="font-display text-[11px] tracking-[0.5em] uppercase text-white/60 mb-8">
             Est. 2026 · Muscat
           </p>
           <h1 className="font-display text-5xl sm:text-7xl md:text-8xl leading-[1.05] tracking-tight">
             {t("brand")}
           </h1>
-          <div className="mx-auto my-10 h-px w-24 bg-white/40" />
-          <p className="font-body text-lg md:text-2xl text-white/80 italic max-w-2xl mx-auto leading-relaxed">
+          <div className="mx-auto my-10 h-px w-16 bg-white/35" />
+          <p className="font-body text-lg md:text-2xl text-white/75 italic max-w-2xl mx-auto leading-relaxed">
             {t("tagline")}
           </p>
-          <div className="mt-14">
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/vehicles"
               data-testid="hero-cta-view-inventory"
-              className="inline-flex items-center gap-3 bg-white text-black font-display text-[12px] tracking-[0.32em] uppercase px-10 py-5 hover:bg-[#f5f5f5] transition-colors"
+              className="inline-flex items-center gap-3 bg-white text-black font-display text-[12px] tracking-[0.32em] uppercase px-10 py-5 hover:bg-[#e8e8e8] transition-colors"
             >
               {t("cta_view_inventory")}
               {isRTL ? <ArrowLeft strokeWidth={1} size={16} /> : <ArrowRight strokeWidth={1} size={16} />}
             </Link>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-3 border border-white/45 text-white font-display text-[12px] tracking-[0.32em] uppercase px-10 py-5 hover:border-white transition-colors"
+            >
+              {t("cta_test_drive") ?? "Book a Test Drive"}
+            </Link>
           </div>
         </div>
 
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/40">
-          <div className="h-12 w-px bg-white/30" />
-          <span className="font-display text-[10px] tracking-[0.4em] uppercase">Scroll</span>
+        {/* Carousel dots */}
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+          {[0, 1, 2, 3].map((i) => (
+            <button
+              key={i}
+              onClick={() => setActiveSlide(i)}
+              className={`h-px transition-all duration-300 ${
+                activeSlide === i ? "w-8 bg-white" : "w-5 bg-white/30"
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Scroll hint */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-white/35">
+          <div className="h-10 w-px bg-white/25" />
+          <span className="font-display text-[9px] tracking-[0.4em] uppercase">Scroll</span>
         </div>
       </section>
 
