@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Globe, Send, Instagram, Youtube, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Globe, Send, Instagram, Youtube, MessageCircle, Facebook } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { VEHICLES, GALLERY_IMAGES } from "@/data/vehicles";
 import VehicleCard from "@/components/VehicleCard";
@@ -231,6 +231,7 @@ const Home = () => {
             <SocialIcon icon={Send} label="Telegram" testid="social-telegram" />
             <SocialIcon icon={Instagram} label="Instagram" testid="social-instagram" />
             <SocialIcon icon={Youtube} label="YouTube" testid="social-youtube" />
+            <SocialIcon icon={Facebook} label="Facebook" testid="social-facebook" />
           </div>
         </div>
       </section>
