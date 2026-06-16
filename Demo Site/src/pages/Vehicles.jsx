@@ -153,7 +153,20 @@ const Vehicles = () => {
       {/* BRAND LOGO BAR */}
       <div
         data-testid="brand-bar"
-        className="border-y border-[#1a1a1a] overflow-x-auto no-scrollbar"
+        className="border-y border-[#1a1a1a] overflow-x-auto 
+                  /* 🚀 TAILWIND/SAFARI/CHROME FORCED SCROLLBAR STYLING */
+                  [&::-webkit-scrollbar]:block
+                  [&::-webkit-scrollbar]:h-[8px] 
+                  [&::-webkit-scrollbar-track]:bg-[#0d0d0d] 
+                  [&::-webkit-scrollbar-track]:border-t
+                  [&::-webkit-scrollbar-track]:border-[#1a1a1a]
+                  [&::-webkit-scrollbar-thumb]:bg-[#333333] 
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  hover:[&::-webkit-scrollbar-thumb]:bg-[#444444]
+                  
+                  /* FIREFOX FORCED STYLING */
+                  [scrollbar-width:thin]
+                  [scrollbar-color:#333333_#0d0d0d]"
       >
         <div className="flex min-w-max">
           <button
@@ -167,6 +180,7 @@ const Vehicles = () => {
               {t("all_brands")}
             </span>
           </button>
+          
           {BRANDS.map((b) => (
             <BrandLogo
               key={b}
