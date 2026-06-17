@@ -116,7 +116,7 @@ router.get('/find/type/:type', async function(req, res) {
 
 // ------------------------------------------------------------------------------------------------- //
 // For adding a new product to the Stock
-router.post('/admin/addnew', upload.array('images'), async (req, res) => {
+router.post('/user/addnew', upload.array('images'), async (req, res) => {
     try {
         // Text data is in req.body
         const { make, model, year, price, description, electric, featured, draft, type, user } = req.body;                    // <-- Change this as use case

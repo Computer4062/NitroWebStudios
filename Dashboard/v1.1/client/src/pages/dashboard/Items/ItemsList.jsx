@@ -192,12 +192,17 @@ function ItemsList() {
 							
 							{/* Image Section */}
 							<div className="col-4 position-relative">
-							<img 
-								src={`http://localhost:3000/public${item.images && item.images ? item.images : ''}`}
-								className="img-fluid object-fit-cover h-100 w-100" 
+								<img
+								src={`http://localhost:3000/public${item.images ? item.images : ''}`}
+								
+								className="object-fit-cover w-100" 
 								alt={item.model || 'Vehicle'}
-								style={{ minHeight: '160px' }}
-							/>
+								
+								style={{ 
+									height: '220px',       // Forces every single card image to be exactly this height
+									objectPosition: 'center' // Guarantees the crop happens perfectly from the dead center
+								}}
+								/>
 							</div>
 
 							{/* Data Section */}

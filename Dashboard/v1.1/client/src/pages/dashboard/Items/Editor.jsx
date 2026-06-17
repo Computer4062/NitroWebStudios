@@ -189,7 +189,7 @@ function UpdateItem() {
 						<div className="col-md-4">
 							<label className="form-label">Year</label>
 							<input type="number" className="form-control" value={vehicleData.year} 
-								onChange={(e) => setVehicleData({...vehicleData, model: e.target.value})} />
+								onChange={(e) => setVehicleData({...vehicleData, year: e.target.value})} />
 						</div>
 						<div className="col-md-4">
 							<label className="form-label">Price (OMR)</label>

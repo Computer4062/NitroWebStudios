@@ -8,6 +8,7 @@ import "./Dashboard.css"
 const AnalyticsDashboard = () => {
   const [analyticsData, setAnalyticsData] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [timeframe, setTimeframe] = useState('daily'); // Options: 'daily' | 'monthly' | 'yearly'
   const [chartData, setChartData] = useState([]);
 
@@ -160,56 +161,95 @@ const AnalyticsDashboard = () => {
               </div>
             </div>
 
-            {/* --- SELECTION GRID COMPONENT --- */}
-            <div className="card-body p-4 bg-white">
-              <h6 className="fw-bold mb-3 text-secondary text-uppercase small tracking-wide">Select Product Track</h6>
+          {/* --- SELECTION GRID COMPONENT --- */}
+          <div className="card-body p-4 bg-white">
+            
+            {/* 🚀 NEW: Search Bar & Section Header Row */}
+            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 mb-4">
+              <h6 className="fw-bold mb-0 text-secondary text-uppercase small tracking-wide">
+                Select Product Track
+              </h6>
               
+              {/* Search Input Box */}
+              <div className="position-relative" style={{ maxWidth: '350px', width: '100%' }}>
+                <input
+                  type="text"
+                  className="form-control form-control-sm ps-5 bg-light-subtle border-light-subtle rounded-pill"
+                  placeholder="Search product by name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ padding: '0.5rem 1rem 0.5rem 2.5rem' }}
+                />
+                {/* Dynamic Search / Clear Icon */}
+                <div className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted">
+                  {searchQuery ? (
+                    <i className="bi bi-x-circle-fill cursor-pointer" onClick={() => setSearchQuery('')}></i>
+                  ) : (
+                    <i className="bi bi-search small"></i>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+              {/* --- SELECTION GRID WITH SEARCH FILTER APPLIED --- */}
               <div className="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
-                {analyticsData.map((item) => {
-                  const isSelected = selectedProduct && selectedProduct._id === item._id;
-                  const itemImageSrc = item.image && item.image ? item.image : null; // ✅ FIXED: Access array index safely
+                {analyticsData
+                  .filter((item) => 
+                    item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((item) => {
+                    const isSelected = selectedProduct && selectedProduct._id === item._id;
+                    const itemImageSrc = item.image ? item.image : null;
 
-                  return (
-                    <div className="col" key={item._id}>
-                      <div 
-                        onClick={() => setSelectedProduct(item)}
-                        className={`card h-100 rounded-3 border transition-all ${
-                          isSelected 
-                            ? 'border-primary shadow-sm bg-light-primary text-primary' 
-                            : 'border-light-subtle hover-shadow bg-white text-dark'
-                        }`}
-                        style={{ cursor: 'pointer', transition: 'all 0.2s ease-in-out' }}
-                      >
-                        {/* Image Frame Viewport Container */}
-                        <div className="bg-light d-flex align-items-center justify-content-center overflow-hidden rounded-top-3" style={{ height: '120px' }}>
-                          {itemImageSrc ? (
-                            <img 
-                              src={`http://localhost:3000/public${itemImageSrc}`} 
-                              alt={item.name} 
-                              className="w-100 h-100 object-fit-cover"
-                            />
-                          ) : (
-                            <span className="text-muted text-center p-2 small">No Preview</span>
-                          )}
-                        </div>
+                    return (
+                      <div className="col" key={item._id}>
+                        <div 
+                          onClick={() => setSelectedProduct(item)}
+                          className={`card h-100 rounded-3 border transition-all ${
+                            isSelected 
+                              ? 'border-primary shadow-sm bg-light-primary text-primary' 
+                              : 'border-light-subtle hover-shadow bg-white text-dark'
+                          }`}
+                          style={{ cursor: 'pointer', transition: 'all 0.2s ease-in-out' }}
+                        >
+                          {/* Image Frame Viewport Container */}
+                          <div className="bg-light d-flex align-items-center justify-content-center overflow-hidden rounded-top-3" style={{ height: '120px' }}>
+                            {itemImageSrc ? (
+                              <img 
+                                src={`http://localhost:3000/public${itemImageSrc}`} 
+                                alt={item.name} 
+                                className="w-100 h-100 object-fit-cover"
+                              />
+                            ) : (
+                              <span className="text-muted text-center p-2 small">No Preview</span>
+                            )}
+                          </div>
 
-                        {/* Core Card Info Tally Metadata */}
-                        <div className="card-body p-3 d-flex flex-column justify-content-between">
-                          <p className="card-title fw-bold text-truncate mb-1 small" title={item.name}>
-                            {item.name}
-                          </p>
-                          <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                            <span className="text-muted font-monospace" style={{ fontSize: '10px' }}>Lifetime:</span>
-                            <span className="badge rounded-pill bg-secondary px-2 py-1 font-monospace">
-                              {calculateLifetimeHits(item)} {/* ✅ FIXED: Real-time sum calculation */}
-                            </span>
+                          {/* Core Card Info Tally Metadata */}
+                          <div className="card-body p-3 d-flex flex-column justify-content-between">
+                            <p className="card-title fw-bold text-truncate mb-1 small" title={item.name}>
+                              {item.name}
+                            </p>
+                            <div className="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                              <span className="text-muted font-monospace" style={{ fontSize: '10px' }}>Lifetime:</span>
+                              <span className="badge rounded-pill bg-secondary px-2 py-1 font-monospace">
+                                {calculateLifetimeHits(item)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
+
+              {/* 🚀 NEW: Fallback UI State if no match is found */}
+              {analyticsData.filter((item) => item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                <div className="text-center py-5">
+                  <i className="bi bi-patch-question text-muted h3"></i>
+                  <p className="text-muted mb-0 mt-2">No items found matching "{searchQuery}"</p>
+                </div>
+              )}
             </div>
             
             </div>

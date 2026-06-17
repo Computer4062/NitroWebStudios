@@ -6,7 +6,7 @@ import Nav from "../../../components/dashboard/Nav.jsx"
 function AddItems() {
   	// Prepare vehicle data variables
 	const [vehicleData, setVehicleData] = useState({
-		make: '', model: '', year: 2026, type: 'Sedan',
+		make: '', model: '', year: 0, type: 'Sedan',
 		price: 0, color: '', mileage: 0, _electric: false, featured: false,
 		description: '', draft: true, user: ''
 	});
@@ -62,6 +62,7 @@ function AddItems() {
 			}
 
 			const data = await response.json();
+			console.log(data)
 			//setVehicleData({...vehicleData, user: data.user})      // Mark that the data was last edited/writern by that specific user
 
 			setVehicleData(prevData => ({...prevData, user: data.name}));
@@ -88,7 +89,7 @@ function AddItems() {
 
 		// 3. Send the request to the server
 		try {
-			const response = await fetch("http://localhost:3000/api/stocks/admin/addnew", {
+			const response = await fetch("http://localhost:3000/api/stocks/user/addnew", {
 				method: 'POST',
 				// Note: DO NOT set 'Content-Type' header manually when using FormData. 
 				// The browser will automatically set it to 'multipart/form-data' with the correct boundary.
@@ -158,7 +159,7 @@ function AddItems() {
 						<div className="col-md-4">
 							<label className="form-label">Year</label>
 							<input type="number" className="form-control" value={vehicleData.year} 
-								onChange={(e) => setVehicleData({...vehicleData, model: e.target.value})} />
+								onChange={(e) => setVehicleData({...vehicleData, year: e.target.value})} />
 						</div>
 						<div className="col-md-4">
 							<label className="form-label">Price (OMR)</label>
