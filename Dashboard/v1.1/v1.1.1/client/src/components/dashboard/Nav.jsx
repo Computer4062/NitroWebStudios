@@ -33,7 +33,7 @@ function Nav() {
 
 	const handleLogout = async() => {
 		try{
-			await fetch('http://localhost:3000/api/accounts/logout', {
+			await fetch('http://localhost:3000/api/accounts/user/logout', {
 				method: 'POST',
 				credentials: 'include'
 			});
@@ -111,12 +111,6 @@ function Nav() {
                 <i className="bi bi-database"></i> Database
               </a>
             </li>
-
-            <li className="nav-item">
-              <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/siteeditor" target="_blank">
-                <i className="bi bi-pencil-square"></i> Site Editor
-              </a>
-            </li>
           </ul>
 
           {/* Accounts Section */}
@@ -134,6 +128,11 @@ function Nav() {
             <li className="nav-item">
               <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/profile">
                 <i className="bi bi-person-circle"></i> My Profile
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link d-flex align-items-center gap-2 text-dark" href="/dashboard/mylistings">
+                <i className="bi bi-person-circle"></i> My Listings
               </a>
             </li>
             <li className="nav-item">

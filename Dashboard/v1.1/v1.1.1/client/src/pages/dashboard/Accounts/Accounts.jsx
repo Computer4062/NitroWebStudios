@@ -13,7 +13,7 @@ function Accounts() {
 	}, []);
 
 	const fetchUsers = async () => {
-	const res = await fetch("http://localhost:3000/api/accounts/users", { credentials: 'include' });
+	const res = await fetch("http://localhost:3000/api/accounts/user/users", { credentials: 'include' });
 	const data = await res.json();
 	setUsers(data);
 	};
@@ -50,7 +50,7 @@ function Accounts() {
 	// Function for deleting exsisting accounts
 	const handleDeleteUser = async (id, username) => {
 	if (window.confirm(`Are you sure you want to delete ${username}?`)) {
-		await fetch(`http://localhost:3000/api/accounts/delete-user/${id}`, { 
+		await fetch(`http://localhost:3000/api/accounts/admin/delete-user/${id}`, { 
 			method: 'DELETE', 
 			credentials: 'include' 
 		});
@@ -72,7 +72,7 @@ function Accounts() {
 		setLoading(true); // 1. Start the spinn
 
 		try {
-			const response = await fetch("http://localhost:3000/api/accounts/register", {
+			const response = await fetch("http://localhost:3000/api/accounts/admin/register", {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(newUser),
@@ -257,7 +257,7 @@ function Accounts() {
 							{/* Also removed border-start which looked bad on mobile */}
 							<div className="col-12 col-md-4 text-center order-1 order-md-2 border-md-start"> 
 								<img 
-									src={`http://localhost:3000/public/images/profiles/${selectedUser.profile_img}`} 
+									src={`http://localhost:3000/public/uploads/profiles/${selectedUser.profile_img}`} 
 									className="rounded-circle img-thumbnail shadow-sm mb-3 mb-md-2" /* Adjusted margin */
 									style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
 									alt="Profile"
@@ -293,17 +293,16 @@ function Accounts() {
 								<tr key={user._id}>
 									<td>
 										<div class="d-flex align-items-center">
-											<img src={`http://localhost:3000/public/images/profiles/${user.profile_img}`} class="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
+											<img src={`http://localhost:3000/public/uploads/profiles/${user.profile_img}`} class="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
 											<span class="fw-bold text-dark">{user.username}</span>
 										</div>
 									</td>
 									<td>
 										<div>
 											{user.admin && <span className="badge bg-danger me-1">Admin</span>}
-											{user.technician && <span className="badge bg-info me-1">Technician</span>}
 											
 											{/* Only shows if they are neither an Admin nor a Technician */}
-											{!user.admin && !user.technician && (
+											{!user.admin && (
 												<span className="badge bg-primary">Editor</span>
 											)}
 										</div>

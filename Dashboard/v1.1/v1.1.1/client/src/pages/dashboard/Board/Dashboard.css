@@ -27,3 +27,15 @@
   background-size: 30px 30px;
   mask-image: radial-gradient(circle, black, transparent 80%);
 }
+
+                .hover-shadow:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+                  border-color: #b6d4fe !important;
+                }
+                .bg-light-primary {
+                  background-color: #f0f5ff !important;
+                }
+                .extra-small {
+                  font-size: 11px;
+                }

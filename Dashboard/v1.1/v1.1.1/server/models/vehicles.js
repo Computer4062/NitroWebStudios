@@ -17,7 +17,8 @@ const vehicleSchema = new mongoose.Schema({
 	description: {type: String},
 	images: [String],
 	_electric: {type: Boolean},
-	featured: {type: Boolean}
+	featured: {type: Boolean},
+	user: {type: String, required: true}
 
 }, {collection: 'vehicles'});
 

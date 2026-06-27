@@ -5,6 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url';
 
 import {Stock} from "../models/vehicles.js"
+import { PageVisit } from '../models/visits.js'; // Import your structured layout model
 
 import Logger from "../utils/Logger.js"
 
@@ -118,7 +119,7 @@ router.get('/find/type/:type', async function(req, res) {
 router.post('/admin/addnew', upload.array('images'), async (req, res) => {
     try {
         // Text data is in req.body
-        const { make, model, year, price, description, electric, featured, draft, type } = req.body;                    // <-- Change this as use case
+        const { make, model, year, price, description, electric, featured, draft, type, user } = req.body;                    // <-- Change this as use case
 
         // Image details are in req.files
         // We map them to get just the filenames/paths to save in the DB
@@ -134,11 +135,12 @@ router.post('/admin/addnew', upload.array('images'), async (req, res) => {
             featured: featured === 'true',
             images: imagePaths, // Array of strings stored in MongoDB
             draft: draft,
-            type: type
+            type: type,
+            user: user
         });
 
-        await newProduct.save();
-        
+        const savedProduct = await newProduct.save();
+
         res.status(201).json({ message: "Product added successfully!"});
 
     } catch (error) {

@@ -4,10 +4,11 @@ import Dash from "../../../components/Dashboard/Dash.jsx"
 import Nav from "../../../components/Dashboard/Nav.jsx"
 
 function AddItems() {
+  	// Prepare vehicle data variables
 	const [vehicleData, setVehicleData] = useState({
 		make: '', model: '', year: 2026, type: 'Sedan',
 		price: 0, color: '', mileage: 0, _electric: false, featured: false,
-		description: '', draft: true
+		description: '', draft: true, user: ''
 	});
 
 	const [loading, setLoading] = useState(false);
@@ -46,6 +47,29 @@ function AddItems() {
 	const handleAddVehicle = async (e, isDraft = true) => {
 		e.preventDefault();
 		setLoading(true);
+
+		// Get username of user from backend
+																								// You can use the same functions used in the profile pages here as well
+		try{
+			const response = await fetch("http://localhost:3000/api/accounts/check-username", {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			if(response.status === 401){
+				// If not logged in, kick them to login page
+				navigate("/dashboard/items");
+			}
+
+			const data = await response.json();
+			//setVehicleData({...vehicleData, user: data.user})      // Mark that the data was last edited/writern by that specific user
+
+			setVehicleData(prevData => ({...prevData, user: data.name}));
+
+		} catch(error) {
+			navigate("/dashboard/items");
+		}
+		
 
 		// Create the FormData object
 		const formData = new FormData();

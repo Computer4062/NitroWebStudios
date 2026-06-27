@@ -9,23 +9,38 @@ import "./Details.css"
 // --------------------------------------------------------
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3000");
+// 1. Establish or retrieve the tab's unique Session ID from sessionStorage
+let sessionId = sessionStorage.getItem('analytics_session_id');
+if (!sessionId) {
+  // Generates a clean random string like "sess_a1b2c3d4"
+  sessionId = 'sess_' + Math.random().toString(36).substring(2, 15);
+  sessionStorage.setItem('analytics_session_id', sessionId);
+}
+
+// 2. Connect to your backend server, passing the session ID in the auth payload
+const socket = io("http://localhost:3000", {
+  auth: { sessionId }
+});
 // --------------------------------------------------------
 
 function Details() {
-	//const location = useLocation();
+	const location = useLocation();
 
 	// -------------------------------------------------------- FOR TRACKING
+	useEffect(() => {
+		// Wait until the socket is fully ready, then emit the path change
+		const currentPath = location.pathname;
 
-		useEffect(() => {
-			// location.pathname will correctly be "/inventory/12345" 
-			// when you navigate there.
-			const currentPath = location.pathname;
-			
-			socket.emit('page_view', { 
-			pagePath: currentPath 
-			});
-		}, [location]); // This ensures it fires every time the URL changes
+		if (socket.connected) {
+		socket.emit('page_view', { pagePath: currentPath });
+		} else {
+		// If the socket is still connecting, wait for the connection event first
+		socket.once('connect', () => {
+			socket.emit('page_view', { pagePath: currentPath });
+		});
+		}
+
+	}, [location]); // Fires flawlessly whenever the product URL route changes
 	// --------------------------------------------------------
 
 

@@ -13,11 +13,13 @@ import databaseRouter from "./routers/database.js"
 import editorRouter from "./routers/editor.js"
 import trackerRouter from "./routers/tracker.js"
 
-import { verifyAdmin } from './middleware/Authenciation.js';
+import { verifyAdmin, verifyUser } from './middleware/Authenciation.js';
 
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { initSocket } from './utils/socket.js';
+
+import { PageVisit } from './models/visits.js';
 
 // Code for setting up express app
 const PORT = process.env.PORT;
@@ -35,18 +37,17 @@ app.use(express.json())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(morgan("dev"))
-app.use('/public/images', express.static('public/images'));
 app.use('/public/uploads', express.static('public/uploads'));
 app.set('etag', false);
 
-// For API calls that require admin access: Ex: updating inventory
+// For API calls that require admin/user access: Ex: updating inventory, updating profiles
 
-app.use("/api/stocks/admin", verifyAdmin, stockRoutes)
-app.use("/api/accounts/admin", verifyAdmin, accountRoutes)
-app.use("/api/logs/admin", verifyAdmin, loggerRoutes)
-app.use("/api/database/admin", verifyAdmin, databaseRouter)
-app.use("/api/editor/admin", verifyAdmin, editorRouter)
-app.use("/api/analytics/admin", verifyAdmin, trackerRouter);
+app.use("/api/stocks/admin", verifyAdmin, stockRoutes); 			app.use("/api/stocks/admin", verifyAdmin, stockRoutes);
+app.use("/api/accounts/admin", verifyAdmin, accountRoutes); 		app.use("/api/accounts/admin", verifyAdmin, accountRoutes)
+app.use("/api/logs/admin", verifyAdmin, loggerRoutes); 				app.use("/api/logs/admin", verifyAdmin, loggerRoutes)
+app.use("/api/database/admin", verifyAdmin, databaseRouter); 		app.use("/api/database/admin", verifyAdmin, databaseRouter)
+app.use("/api/editor/admin", verifyAdmin, editorRouter); 			app.use("/api/editor/admin", verifyUser, editorRouter)
+app.use("/api/analytics/admin", verifyAdmin, trackerRouter); 		app.use("/api/analytics/user", verifyUser, trackerRouter);
 
 // For API calls that does not require admin access
 

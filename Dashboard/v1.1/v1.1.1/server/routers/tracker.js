@@ -1,64 +1,56 @@
 import express from 'express';
-import { getLiveCount } from '../utils/socket.js';
 import { PageVisit } from '../models/visits.js';
 import {Stock} from "../models/vehicles.js"
 
 const router = express.Router();
 
-router.get('/admin/live-count', (req, res) => {
-  res.json({
-    activeUsers: getLiveCount(),
-    timestamp: new Date().toISOString()
-  });
-});
-
-router.get('/admin/top-products', async (req, res) => {
+router.get('/user/top-products', async (req, res) => {
     try {
-        // 1. Get visits that start with '/inventory/'
-        const visits = await PageVisit.find({ path: { $regex: /^\/inventory\// } })
-            .sort({ hits: -1 })
-            .limit(10);
+        // 1. Fetch all raw page visit documents targeting inventory routes
+        const visits = await PageVisit.find({ path: { $regex: /^\/inventory\// } });
 
-        // 2. Map through visits to fetch Product details
-        const detailedVisits = await Promise.all(visits.map(async (visit) => {
-            // Extract the ID (the part after /inventory/)
-            const productId = visit.path.split('/inventory/');
+        // 2. Map through each layout record to attach product details
+        const enrichedVisits = await Promise.all(visits.map(async (visit) => {
+            // Extract the ID portion after /inventory/
+            const productIdStr = visit.path.split('/inventory/')[1];
 
-            // Only proceed if it looks like a valid MongoDB ObjectId
-            if (productId[1] && productId[1].length === 24) {
-                const product = await Stock.findById(productId[1]).select('model images');                       // <-- Change these
-
-                if (product) {
-                    return {
-                        name: product.model,                                                                    // <-- Change these
-                        image: product.images[0],
-                        hits: visit.hits,
-                        path: visit.path
-                    };
-                }
+            // If the path doesn't contain a valid 24-character ObjectId string, return raw visit
+            if (!productIdStr || productIdStr.length !== 24) {
+                return {
+                    ...visit.toObject(),
+                    name: "Unknown Route",
+                    image: null
+                };
             }
-            return null;
+
+            // Fetch the core stock properties using the parsed ID string
+            const product = await Stock.findById(productIdStr).select('model images').lean();
+
+            // Convert the Mongoose document to a plain JavaScript object so we can append keys
+            const rawVisitData = visit.toObject();
+
+            if (product) {
+                return {
+                    ...rawVisitData, // Spreads all original fields: _id, path, todaysHits, hits, lastVisited
+                    name: product.model,
+                    image: product.images && product.images ? product.images : null
+                };
+            }
+
+            // Fallback if the product was deleted from inventory but the visit data still exists
+            return {
+                ...rawVisitData,
+                name: "Deleted Product",
+                image: null
+            };
         }));
 
-        // Filter out any nulls (visits to deleted products or invalid IDs)
-        res.json(detailedVisits.filter(v => v !== null));
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to compile product analytics" });
-    }
-});
+        // 3. Send the full dataset downstream without any filtering or sorting
+        res.json(enrichedVisits);
 
-// Add this to your analytics routes file
-router.post('/admin/reset-product-hits', async (req, res) => {
-    try {
-        // Only reset paths that start with /inventory/
-        await PageVisit.updateMany(
-            { path: { $regex: /^\/inventory\// } },
-            { $set: { hits: 0 } }
-        );
-        res.json({ message: "Product visit counts have been reset to 0." });
     } catch (err) {
-        res.status(500).json({ error: "Failed to reset counts" });
+        console.error('Failed to compile enriched product analytics collection:', err);
+        res.status(500).json({ error: "Failed to compile product analytics" });
     }
 });
 

@@ -10,7 +10,7 @@ function Profile() {
     useEffect(() => {
 	const GetProfile = async() => {
 		try{
-			const response = await fetch("http://localhost:3000/api/accounts/get-profile", {
+			const response = await fetch("http://localhost:3000/api/accounts/user/get-profile", {
 				method: 'GET',
 				credentials: 'include'
 			});
@@ -62,7 +62,7 @@ function Profile() {
 
     setUploading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/accounts/upload-profile-pic", {
+      const response = await fetch("http://localhost:3000/api/accounts/user/upload-profile-pic", {
         method: 'POST',
         body: formData,
         credentials: 'include'
@@ -85,27 +85,45 @@ function Profile() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleUpdateProfile = async () => {
-  try {
-    const response = await fetch("http://localhost:3000/api/accounts/update-profile", {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: profile.username, // Use this to find the user
-        ...profileData
-      }),
-      credentials: 'include'
-    });
+    try {
+      const response = await fetch("http://localhost:3000/api/accounts/admin/update-profile", {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: profile.username, // Use this to find the user
+          ...profileData
+        }),
+        credentials: 'include'
+      });
 
-    if (response.ok) {
-      alert("Profile updated successfully!");
-    } else {
-      const errorData = await response.json();
-      alert(errorData.message || "Update failed");
+      if (response.ok) {
+        alert("Profile updated successfully!");
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || "Update failed");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
-  } catch (error) {
-    console.error("Error updating profile:", error);
-  }
-};
+  };
+
+  // For deleting the profile from the database
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const handleDeleteProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/accounts/user/delete-self/${profile._id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (response.ok) {
+        // Redirect to login or home after deletion
+        window.location.href = '/'; 
+      }
+    } catch (error) {
+      console.error("Deletion failed:", error);
+    }
+  };
 
   return (
     <>
@@ -128,7 +146,7 @@ function Profile() {
               <div class="card border-0 shadow-sm text-center p-4">
                 <div class="mb-3">
                   <img 
-                    src={`http://localhost:3000/public/images/profiles/${profile.profile_img}`} 
+                    src={`http://localhost:3000/public/uploads/profiles/${profile.profile_img}`} 
                     class="rounded-circle img-thumbnail shadow-sm" 
                     alt="Profile" 
                     style={{ width: '150px', height: '150px', objectFit: 'cover' }}
@@ -240,6 +258,47 @@ function Profile() {
                   <div class="form-text text-danger small">
                     Warning: Changing this will update your login credentials.
                   </div>
+                </div>
+              </div>
+
+              {/* Delete Profile Section */}
+              <div className="card border-danger shadow-sm mb-4" style={{ backgroundColor: '#fff5f5' }}>
+                <div className="card-header bg-danger text-white py-3">
+                  <h6 className="mb-0 fw-bold text-uppercase small">Danger Zone</h6>
+                </div>
+                <div className="card-body">
+                  <label className="form-label small fw-bold text-danger">Delete Profile</label>
+                  <p className="text-muted small mb-3">
+                    Deleting your profile is permanent. All your data in the database will be erased and cannot be recovered.
+                  </p>
+
+                  {/* Using a simple state check for a two-step confirmation */}
+                  {!confirmDelete ? (
+                    <button 
+                      className="btn btn-danger w-100 fw-bold"
+                      onClick={() => setConfirmDelete(true)}
+                    >
+                      Delete My Profile
+                    </button>
+                  ) : (
+                    <div className="text-center animate__animated animate__fadeIn">
+                      <p className="fw-bold text-danger small mb-2">Are you absolutely sure?</p>
+                      <div className="d-flex gap-2">
+                        <button 
+                          className="btn btn-secondary flex-grow-1"
+                          onClick={() => setConfirmDelete(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          className="btn btn-outline-danger flex-grow-1 fw-bold"
+                          onClick={handleDeleteProfile} // This would call your Node.js API
+                        >
+                          Yes, Delete it
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

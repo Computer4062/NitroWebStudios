@@ -13,7 +13,6 @@ function ItemsList() {
 	const [users, setUsers] = useState([]); // Raw fetched user profiles
 	const [searchQuery, setSearchQuery] = useState(""); // for search string
 	const [currentUser, setCurrentUser] = useState(null); // Stores the logged-in user object
-	const [isAdmin, setIsAdmin] = useState();
 
   useEffect(() => {
     fetch('http://localhost:3000/api/stocks/all')
@@ -43,7 +42,6 @@ function ItemsList() {
           const authData = await authRes.json();
           // Assuming backend returns an object with a user sub-property (e.g., { user: { _id: "...", username: "..." } })
           setCurrentUser(authData.name);
-		  console.log(currentUser);
         }
 
         // B. Fetch all registered user profiles (for the card footers)
@@ -53,15 +51,6 @@ function ItemsList() {
         });
         const usersData = await usersRes.json();
         setUsers(usersData);
-
-		// Check if user is an admin
-		const usersAdmin = await fetch("http://localhost:3000/api/accounts/check-auth", { 
-          credentials: 'include',
-		  method: 'GET'
-        });
-		const userAdminData = await usersAdmin.json();
-      	setIsAdmin(userAdminData.admin);
-		console.log(isAdmin);
 
       } catch (error) {
         console.error("Error loading dashboard telemetry:", error);
@@ -122,10 +111,10 @@ function ItemsList() {
 			<nav aria-label="breadcrumb">
 				<ol className="breadcrumb mb-1">
 				<li className="breadcrumb-item small text-muted">Dashboard</li>
-				<li className="breadcrumb-item small active" aria-current="page">Inventory</li>
+				<li className="breadcrumb-item small active" aria-current="page">Listing</li>
 				</ol>
 			</nav>
-			<h1 className="h3 fw-bold text-dark">Vehicle Inventory</h1>
+			<h1 className="h3 fw-bold text-dark">My Listings</h1>
 			</div>
 			
 			<div className="btn-toolbar mb-2 mb-md-0">
@@ -185,6 +174,7 @@ function ItemsList() {
 					// Safely compare current user's ID or Username against who created the item.
 					// If currentUser is null, it naturally defaults to false.
 					const isOwner = currentUser && (currentUser === item.user);
+					if(!isOwner) return null;
 
 					return (
 					<div className="col-12 col-xl-6" key={item._id}>
@@ -244,7 +234,6 @@ function ItemsList() {
 								</Link>
 
 								{/* 🚀 CONDITIONAL RENDER: Only visible if the item belongs to the logged-in user */}
-								{(isOwner || isAdmin) && (
 									<>
 									{/* DELETE BUTTON */}
 									<button 
@@ -259,7 +248,6 @@ function ItemsList() {
 										<i className="bi bi-pencil-square"></i> Edit
 									</Link>
 									</>
-								)}
 								</div>
 
 							</div>

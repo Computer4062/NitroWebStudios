@@ -91,7 +91,7 @@ router.post('/login-step-2', async (req, res) => {
 // -----------------------------------------------------
 
 // Register a new user to the database
-router.post('/register', verifyUser, async(req, res) => {
+router.post('/admin/register', verifyUser, async(req, res) => {
 	try{
 		const {
 			username, password, email, admin,
@@ -159,8 +159,36 @@ router.get('/check-auth', async(req, res) => {
 
 // -----------------------------------------------------
 
+// Check cookies to see the username of the user
+router.get('/check-username', async(req, res) => {
+	// Check if 'token' cookie exsists
+	const token = req.cookies.token;
+
+	if(!token){
+		// unauthorized warning
+		return res.status(401).json({authenciated: false});
+	}
+
+	try{
+		// Checks if token is valid AND matches to the secret key
+		const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+		let user = await Account.findById(decoded.userId);
+
+		// If token is legit
+		return res.status(200).json({
+            name: user.username
+		});
+	}catch(error){
+		// If fake or expired
+		console.error("JWT verfication failed: ", error.message);
+		return res.status(401).json({authenciated: false, message: "Invalid token"})
+	}
+});
+
+// -----------------------------------------------------
+
 // Find profile of a specific user
-router.get('/get-profile', async function(req, res) {
+router.get('/user/get-profile', async function(req, res) {
 	try {
 		// Get userID of user
 		const token = req.cookies.token;
@@ -194,7 +222,7 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 } // Limit to 5MB for extra security
 });
 
-router.post('/upload-profile-pic', upload.single('profileImage'), async (req, res) => {
+router.post('/user/upload-profile-pic', upload.single('profileImage'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).send('No file uploaded.');
         
@@ -305,7 +333,7 @@ router.get('/verify-token', async (req, res) => {
 
 // -----------------------------------------------------
 
-router.put('/update-profile', async (req, res) => {
+router.put('/user/update-profile', async (req, res) => {
     try {
         const { username, first_name, last_name, email, password } = req.body;
 
@@ -338,10 +366,10 @@ router.put('/update-profile', async (req, res) => {
 
 // Get all users for the management table
 // Backend: admin.js
-router.get('/users', async (req, res) => {
+router.get('/user/users', async (req, res) => {
     try {
         // Added first_name and last_name to the selection
-        const users = await Account.find({}, 'username email admin technician profile_img first_name last_name');
+        const users = await Account.find({}, 'username email admin profile_img first_name last_name');
         res.json(users);
     } catch (err) {
         res.status(500).send("Error fetching users");
@@ -349,7 +377,7 @@ router.get('/users', async (req, res) => {
 });
 
 // Admin-only email update
-router.put('/update-email/:id', async (req, res) => {
+router.put('/admin/update-email/:id', async (req, res) => {
     try {
         await Account.findByIdAndUpdate(req.params.id, { email: req.body.email });
         res.status(200).json({ message: "Email updated successfully" });
@@ -359,7 +387,7 @@ router.put('/update-email/:id', async (req, res) => {
 });
 
 // Admin-only delete account
-router.delete('/delete-user/:id', verifyAdmin, async (req, res) => {
+router.delete('/admin/delete-user/:id', async (req, res) => {
     try {
         // Optional: Prevent admin from deleting themselves
         if (req.params.id === req.userId) {
@@ -373,10 +401,21 @@ router.delete('/delete-user/:id', verifyAdmin, async (req, res) => {
     }
 });
 
+// Admin-only delete account
+router.delete('/user/delete-self/:id', async (req, res) => {
+    try {
+        
+        await Account.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: "Account deleted" });
+    } catch (err) {
+        res.status(500).send("Delete failed");
+    }
+});
+
 // -----------------------------------------------------
 
 // For logging out
-router.post('/logout', (req, res) => {
+router.post('/user/logout', (req, res) => {
     // The name 'token' must match the name you used when creating the cookie
     res.clearCookie('token', {
         httpOnly: true,

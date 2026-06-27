@@ -7,24 +7,7 @@ import Footer from './components/footer/Footer'
 import Card from './components/card/Card'
 import "./home.css"
 
-// -------------------------------------------------------
-import { io } from "socket.io-client";
-
-const socket = io("http://localhost:3000");
-// -------------------------------------------------------
-
 function Home() {
-
-  // ----------------------------------------------------------------------------------------
-    const location = useLocation();
-
-  useEffect(() => {
-    // Fire the event to the server whenever the URL path changes
-    socket.emit('page_view', { 
-      pagePath: location.pathname 
-    });
-  }, [location]);
-  // ----------------------------------------------------------------------------------------
 
   const [items, setItems] = useState([]);
 

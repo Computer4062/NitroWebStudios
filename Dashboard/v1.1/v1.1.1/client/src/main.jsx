@@ -12,24 +12,24 @@ import Team from './pages/team/Team.jsx'
 
 // Admin end related pages
 import Dashboard from './pages/dashboard/Board/Dashboard.jsx'
-
 import ItemsList from './pages/dashboard/Items/ItemsList.jsx'
 import AddItems from './pages/dashboard/Items/AddItems.jsx'
 import Editor from './pages/dashboard/Items/Editor.jsx'
 import Drafts from './pages/dashboard/Items/Drafts.jsx'
-
 import HelpCenter from './pages/dashboard/HelpCenter/HelpCenter.jsx'
 import Logs from './pages/dashboard/Logs/Logs.jsx'
 import DataBase from './pages/dashboard/DataBase/DataBase.jsx'
-import SiteEditor from './pages/dashboard/SiteEditor/Editor.jsx'
-
 import Accounts from './pages/dashboard/Accounts/Accounts.jsx'
 import Profile from './pages/dashboard/Profile/Profile.jsx'
-
+import MyPosts from './pages/dashboard/Profile/MyPosts.jsx'
 import EMPTY from "./pages/dashboard/empty_page/EMPTY.jsx"
+
+// Admin Guard
+import AdminGuard from './utilities/AdminGuard.jsx'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/inventory" element={<Inventory />} />
@@ -49,10 +49,10 @@ createRoot(document.getElementById('root')).render(
       <Route path="/dashboard/info" element={<HelpCenter />} />
       <Route path="/dashboard/logs" element={<Logs />}/>
       <Route path="/dashboard/database" element={<DataBase />}/>
-      <Route path="/dashboard/siteeditor" element={<SiteEditor />}/>
 
-      <Route path="/dashboard/accounts" element={<Accounts />}/>
+      <Route path="/dashboard/accounts" element={ <AdminGuard> <Accounts /> </AdminGuard>}/>
       <Route path="/dashboard/profile" element={<Profile />}/>
+      <Route path="/dashboard/mylistings" element={<MyPosts />}/>
 
       <Route path="/dashboard/empty" element={<EMPTY />}/>
     </Routes>

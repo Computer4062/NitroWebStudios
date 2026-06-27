@@ -6,7 +6,7 @@ const accountsSchema = new mongoose.Schema({
 	email: {type: String, required: true},
 
 	admin: {type: Boolean, required: true, default: false},
-	technician: {type: Boolean, required: true, default: false},
+	//technician: {type: Boolean, required: true, default: false},
 
 	profile_img: {type: String, required: false, default: "default.jpg"},
 	first_name: {type: String, required: true},
