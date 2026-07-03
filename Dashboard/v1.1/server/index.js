@@ -36,7 +36,7 @@ const httpServer = createServer(app);
 
 app.use(cookieParser());
 app.use(cors({
-	origin: ['http://localhost:5173', 'https://nitro-web-studios-themes.vercel.app', 'https://nitro-web-studios-themes-git-main-computer4062s-projects.vercel.app'],
+	origin: ['http://localhost:5173'],
 	credentials: true
 }));
 app.use(express.json())

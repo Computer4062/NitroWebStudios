@@ -37,10 +37,12 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         const endpoint = step === 1 
             ? "http://localhost:3000/api/accounts/login-step-1" 
             : "http://localhost:3000/api/accounts/login-step-2";
+
+        setLoading(true); // Start the spinner for this step's request
 
         try {
             const response = await fetch(endpoint, {
@@ -58,14 +60,18 @@ const Login = () => {
                     setError('');
                 } else {
                     window.location.href = "/dashboard"; // Fully logged in!
+                    return; // keep spinner on while we navigate away
                 }
             } else {
                 // If code is wrong or login fails, reboot the page/state
                 alert(data.message || "Authentication failed. Restarting...");
-                window.location.reload(); 
+                window.location.reload();
+                return; // keep spinner on while we reload
             }
         } catch (err) {
             setError("Server connection failed");
+        } finally {
+            setLoading(false); // Stop spinner (unless we returned early above)
         }
     };
 

@@ -113,7 +113,7 @@ const AnalyticsDashboard = () => {
               <div>
                 <h5 className="mb-1 fw-bold text-dark">Traffic Intelligence Dashboard</h5>
                 <p className="text-muted small mb-0">
-                  {selectedProduct ? `Analyzing Product: ${selectedProduct.name}` : 'Select a product component from the grid layout'}
+                  {selectedProduct ? `Analyzing Vehicle: ${selectedProduct.name}` : 'Select a product component from the grid layout'}
                 </p>
               </div>
               
@@ -167,7 +167,7 @@ const AnalyticsDashboard = () => {
             {/* 🚀 NEW: Search Bar & Section Header Row */}
             <div className="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 mb-4">
               <h6 className="fw-bold mb-0 text-secondary text-uppercase small tracking-wide">
-                Select Product Track
+                Select Vehicle Track
               </h6>
               
               {/* Search Input Box */}
@@ -175,7 +175,7 @@ const AnalyticsDashboard = () => {
                 <input
                   type="text"
                   className="form-control form-control-sm ps-5 bg-light-subtle border-light-subtle rounded-pill"
-                  placeholder="Search product by name..."
+                  placeholder="Search Vehicle by name..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ padding: '0.5rem 1rem 0.5rem 2.5rem' }}

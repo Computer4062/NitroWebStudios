@@ -73,7 +73,7 @@ function Nav() {
               <ul className="nav flex-column px-3 gap-1">
                 <li className="nav-item">
                   <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/items">
-                    <i className="bi bi-box-seam"></i> Existing Stock
+                    <i className="bi bi-car-front"></i> Vehicles
                   </a>
                 </li>
                 <li className="nav-item">
