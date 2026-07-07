@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nitro Web Studios — Websites for Dealerships & Rental Fleets</title>
+<meta name="description" content="Nitro Web Studios builds high-performance websites and inventory platforms for car dealerships and car rental businesses.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./main.css">
+</head>
+<body>
+
+<!-- Route spine: persistent navigation signature -->
+<nav class="route" aria-label="Page sections">
+  <div class="route__line"></div>
+  <a href="#intro" class="route__stop" data-stop="intro"><span class="route__dot"></span><span class="route__label">START</span></a>
+  <a href="#services" class="route__stop" data-stop="services"><span class="route__dot"></span><span class="route__label">SERVICES</span></a>
+  <a href="#why-us" class="route__stop" data-stop="why-us"><span class="route__dot"></span><span class="route__label">WHY US</span></a>
+  <a href="#contact" class="route__stop" data-stop="contact"><span class="route__dot"></span><span class="route__label">CONTACT</span></a>
+</nav>
+
+<header class="topbar">
+  <a href="#intro" class="brand">
+    <img src="./assets/logo.png" alt="Nitro Web Studios logo" class="brand__mark">
+    <span class="brand__name">Nitro<span class="brand__name-alt">Web Studios</span></span>
+  </a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="#intro">Home</a>
+    <a href="#services">Services</a>
+    <a href="#why-us">Why Us</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a href="#contact" class="btn btn--ghost topbar__cta">Get a Quote</a>
+  <button class="navtoggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobilemenu" id="mobileMenu">
+  <a href="#intro">Home</a>
+  <a href="#services">Services</a>
+  <a href="#why-us">Why Us</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<main>
+
+  <!-- ============ INTRO / HERO ============ -->
+  <section id="intro" class="section hero">
+    <div class="hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">Web development &amp; IT for the automotive trade</p>
+        <h1 class="hero__title">We build the websites<br> that <span class="hero__title-glow">sell your cars.</span></h1>
+        <p class="hero__sub">Nitro Web Studios designs and engineers websites, inventory dashboards, and booking platforms for car dealerships and rental fleets — built to load fast, rank well, and turn browsers into buyers.</p>
+        <div class="hero__actions">
+          <a href="#contact" class="btn btn--primary">Start your project</a>
+          <a href="#services" class="btn btn--outline">See what we build</a>
+        </div>
+        <ul class="hero__tags">
+          <li>Dealership Sites</li>
+          <li>Rental Booking</li>
+          <li>Inventory Systems</li>
+          <li>SEO &amp; Local Search</li>
+        </ul>
+      </div>
+
+      <div class="hero__panel" aria-hidden="true">
+        <div class="cluster">
+          <div class="cluster__head">
+            <span class="cluster__title">SITE DIAGNOSTICS</span>
+            <span class="cluster__live"><i></i>LIVE</span>
+          </div>
+          <div class="cluster__gauges">
+            <div class="gauge" data-value="98" data-label="PERFORMANCE" data-unit="/100">
+              <svg viewBox="0 0 120 120" class="gauge__svg">
+                <circle class="gauge__track" cx="60" cy="60" r="50"></circle>
+                <circle class="gauge__fill" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="gauge__readout">
+                <span class="gauge__value">0</span>
+                <span class="gauge__unit">/100</span>
+              </div>
+              <span class="gauge__label">Performance</span>
+            </div>
+            <div class="gauge" data-value="96" data-label="SEO" data-unit="/100">
+              <svg viewBox="0 0 120 120" class="gauge__svg">
+                <circle class="gauge__track" cx="60" cy="60" r="50"></circle>
+                <circle class="gauge__fill" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="gauge__readout">
+                <span class="gauge__value">0</span>
+                <span class="gauge__unit">/100</span>
+              </div>
+              <span class="gauge__label">SEO Score</span>
+            </div>
+            <div class="gauge" data-value="99" data-label="UPTIME" data-unit="%">
+              <svg viewBox="0 0 120 120" class="gauge__svg">
+                <circle class="gauge__track" cx="60" cy="60" r="50"></circle>
+                <circle class="gauge__fill" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="gauge__readout">
+                <span class="gauge__value">0</span>
+                <span class="gauge__unit">%</span>
+              </div>
+              <span class="gauge__label">Uptime</span>
+            </div>
+          </div>
+          <div class="cluster__foot">
+            <span>MODEL: DEALER-X</span>
+            <span>BUILD: NITRO.WS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero__fade"></div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section id="services" class="section services">
+    <div class="section__head">
+      <p class="eyebrow">Services</p>
+      <h2 class="section__title">Everything your dealership or fleet needs online</h2>
+      <p class="section__sub">From the first sketch to the site that runs your showroom, we cover the full build — no hand-offs to five different freelancers.</p>
+    </div>
+
+    <div class="services__grid">
+      <article class="service-card">
+        <div class="service-card__icon" data-icon="dealership"></div>
+        <h3>Dealership Websites</h3>
+        <p>Showroom-ready sites with searchable inventory, financing calculators, and listing pages that make every vehicle easy to find and easy to want.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" data-icon="rental"></div>
+        <h3>Car Rental Platforms</h3>
+        <p>Live availability calendars, instant quotes, and online booking flows so customers can reserve a vehicle in a few taps — day or night.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" data-icon="dashboard"></div>
+        <h3>Inventory Dashboards</h3>
+        <p>A back-office your team will actually enjoy using: add listings, manage drafts, track editors, and update pricing without touching code.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" data-icon="seo"></div>
+        <h3>SEO &amp; Local Search</h3>
+        <p>Technical SEO, structured vehicle data, and local search optimisation so your dealership shows up when nearby buyers start looking.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" data-icon="brand"></div>
+        <h3>Brand &amp; UI Design</h3>
+        <p>A visual identity and site design that matches the calibre of the vehicles you sell or rent — from budget fleets to luxury showrooms.</p>
+      </article>
+
+      <article class="service-card">
+        <div class="service-card__icon" data-icon="support"></div>
+        <h3>Hosting &amp; Support</h3>
+        <p>Managed hosting, uptime monitoring, and a support line that answers — so your site stays fast and online while you run your business.</p>
+      </article>
+    </div>
+
+    <!-- Featured work / real preview -->
+    <div class="showcase">
+      <div class="showcase__copy">
+        <p class="eyebrow">Recent build</p>
+        <h3>An inventory system built for a Muscat dealership</h3>
+        <p>Vehicle listings, editor logs, drafts, and filters by brand, body type and drive type — all in one dashboard the dealership's own staff manage day to day, in English and Arabic.</p>
+        <ul class="showcase__list">
+          <li>Real-time inventory with filters by brand, body &amp; price</li>
+          <li>Role-based access for admins and editors</li>
+          <li>Draft &amp; publish workflow with full activity logs</li>
+        </ul>
+      </div>
+      <div class="showcase__frame">
+        <div class="browser-chrome">
+          <span></span><span></span><span></span>
+          <div class="browser-chrome__bar">nwstudios-dealer.app</div>
+        </div>
+        <img src="./assets/dashboard-preview.png" alt="Vehicle inventory dashboard built by Nitro Web Studios, showing a list of luxury cars with prices, filters and editor details" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY CHOOSE US ============ -->
+  <section id="why-us" class="section why">
+    <div class="section__head">
+      <p class="eyebrow">Why Choose Us</p>
+      <h2 class="section__title">Built for the way dealerships and rental fleets actually work</h2>
+      <p class="section__sub">We don't just hand over a website and disappear. We build the platform, keep it running, and keep it converting.</p>
+    </div>
+
+    <div class="why__grid">
+      <div class="why__main">
+        <div class="why-item">
+          <span class="why-item__mark">SERVICE</span>
+          <h3>Customer service that actually picks up</h3>
+          <p>Every client gets a direct line to the people who built their site — not a ticket queue. Most requests get a same-day reply, and we stay on for updates, fixes, and new listings long after launch.</p>
+        </div>
+        <div class="why-item">
+          <span class="why-item__mark">PRESENCE</span>
+          <h3>A stronger online presence, measured</h3>
+          <p>We optimise every page for search and speed, so your inventory shows up when someone nearby searches "SUVs for sale" or "car rental near me" — instead of losing that customer to a competitor's site.</p>
+        </div>
+        <div class="why-item">
+          <span class="why-item__mark">TRUST</span>
+          <h3>A site that makes buyers trust you before they call</h3>
+          <p>Clear pricing, real photos, verified listings, and a professional design signal that your dealership is legitimate — which shortens the distance between "just browsing" and "let's talk numbers."</p>
+        </div>
+      </div>
+
+      <aside class="why__meter" aria-hidden="true">
+        <div class="trust-panel">
+          <span class="trust-panel__title">CUSTOMER TRUST INDEX</span>
+          <div class="trust-panel__ring">
+            <svg viewBox="0 0 160 160">
+              <circle class="trust-panel__track" cx="80" cy="80" r="68"></circle>
+              <circle class="trust-panel__fill" cx="80" cy="80" r="68"></circle>
+            </svg>
+            <div class="trust-panel__value">
+              <strong>+64<span>%</span></strong>
+              <small>avg. lift after launch</small>
+            </div>
+          </div>
+          <ul class="trust-panel__list">
+            <li><span>Response time</span><b>&lt; 24h</b></li>
+            <li><span>Sites monitored</span><b>24/7</b></li>
+            <li><span>Client retention</span><b>92%</b></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section id="contact" class="section contact">
+    <div class="contact__grid">
+      <div class="contact__intro">
+        <p class="eyebrow">Contact Us</p>
+        <h2 class="section__title">Tell us about your dealership or fleet</h2>
+        <p class="section__sub">Send a few details about your business and current site, if you have one. We'll reply with next steps and a realistic timeline — no obligation.</p>
+
+        <div class="contact__details">
+          <div class="contact__detail">
+            <span>Email</span>
+            <a href="mailto:hello@nitrowebstudios.com">hello@nitrowebstudios.com</a>
+          </div>
+          <div class="contact__detail">
+            <span>Phone</span>
+            <a href="tel:+96800000000">+968 00 000 000</a>
+          </div>
+          <div class="contact__detail">
+            <span>Based in</span>
+            <p>Muscat, Oman — working with clients across the Gulf</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact__form" id="contactForm">
+        <div class="field">
+          <label for="name">Full name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" required>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="business">Business name</label>
+            <input type="text" id="business" name="business" placeholder="e.g. Al Nakheel Motors" required>
+          </div>
+          <div class="field">
+            <label for="type">Business type</label>
+            <select id="type" name="type">
+              <option>Car Dealership</option>
+              <option>Car Rental</option>
+              <option>Both</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@business.com" required>
+          </div>
+          <div class="field">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" placeholder="+968 ...">
+          </div>
+        </div>
+        <div class="field">
+          <label for="message">What do you need?</label>
+          <textarea id="message" name="message" rows="4" placeholder="New website, rental booking system, redesign, inventory dashboard..."></textarea>
+        </div>
+        <button type="submit" class="btn btn--primary btn--block">Send message</button>
+        <p class="form__status" id="formStatus" role="status"></p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer__top">
+    <a href="#intro" class="brand brand--footer">
+      <img src="./assets/logo.png" alt="Nitro Web Studios logo" class="brand__mark">
+      <span class="brand__name">Nitro<span class="brand__name-alt">Web Studios</span></span>
+    </a>
+    <nav class="footer__nav" aria-label="Footer">
+      <a href="#intro">Home</a>
+      <a href="#services">Services</a>
+      <a href="#why-us">Why Us</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+  <div class="footer__bottom">
+    <span>© <span id="year"></span> Nitro Web Studios. All rights reserved.</span>
+    <span>Websites &amp; IT for car dealerships and rental fleets.</span>
+  </div>
+</footer>
+
+<script src="./script.js"></script>
+</body>
+</html>
