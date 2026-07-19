@@ -1,0 +1,111 @@
+/* ==========================================================================
+   HighlightCards.css — Demo Car Rental
+   Same brand tokens as Navbar.css / Home.css (safe to duplicate).
+   ========================================================================== */
+
+:root {
+  --dcr-navy: #14213d;
+  --dcr-gold: #c6a15b;
+  --dcr-gold-soft: #e3c98a;
+  --dcr-ivory: #faf9f6;
+  --dcr-slate: #5b6b7c;
+  --dcr-ink: #1a1f2b;
+  --dcr-line: #e7e2d8;
+  --dcr-font-display: "Playfair Display", Georgia, serif;
+  --dcr-font-body: "Inter", "Segoe UI", sans-serif;
+}
+
+.dcr-highlights {
+  padding: 5.5rem 0;
+  background: var(--dcr-ivory);
+  font-family: var(--dcr-font-body);
+}
+
+.dcr-section-heading {
+  max-width: 620px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dcr-eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dcr-gold);
+  margin-bottom: 0.6rem;
+}
+
+.dcr-section-heading h2 {
+  font-family: var(--dcr-font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--dcr-navy);
+  margin-bottom: 0.6rem;
+}
+
+.dcr-section-sub {
+  color: var(--dcr-slate);
+  font-size: 1.02rem;
+  margin-bottom: 0;
+}
+
+/* Card */
+.dcr-card {
+  background: #fff;
+  border: 1px solid var(--dcr-line);
+  border-radius: 14px;
+  padding: 2rem 1.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.dcr-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--dcr-gold), var(--dcr-gold-soft));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+
+.dcr-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -20px rgba(20, 33, 61, 0.28);
+  border-color: transparent;
+}
+
+.dcr-card:hover::before {
+  transform: scaleX(1);
+}
+
+.dcr-card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, var(--dcr-gold-soft), var(--dcr-gold));
+  color: var(--dcr-navy);
+  margin-bottom: 1.1rem;
+}
+
+.dcr-card h3 {
+  font-family: var(--dcr-font-display);
+  font-size: 1.15rem;
+  color: var(--dcr-navy);
+  margin-bottom: 0.55rem;
+}
+
+.dcr-card p {
+  color: var(--dcr-slate);
+  font-size: 0.94rem;
+  line-height: 1.55;
+  margin-bottom: 0;
+}

@@ -1,0 +1,306 @@
+/* ==========================================================================
+   Inventory.css — Demo Car Rental
+   Same brand tokens as the rest of the app (safe to duplicate).
+   Filter sidebar/drawer styling lives in Filter.css.
+   ========================================================================== */
+
+:root {
+  --dcr-navy: #14213d;
+  --dcr-navy-soft: #1f325a;
+  --dcr-gold: #c6a15b;
+  --dcr-gold-soft: #e3c98a;
+  --dcr-ivory: #faf9f6;
+  --dcr-slate: #5b6b7c;
+  --dcr-ink: #1a1f2b;
+  --dcr-line: #e7e2d8;
+  --dcr-green: #2f8f5b;
+  --dcr-amber: #b9791f;
+  --dcr-font-display: "Playfair Display", Georgia, serif;
+  --dcr-font-body: "Inter", "Segoe UI", sans-serif;
+}
+
+.dcr-inventory-page {
+  background: var(--dcr-ivory);
+}
+
+.dcr-eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dcr-gold);
+  margin-bottom: 0.6rem;
+}
+
+.dcr-eyebrow--light {
+  color: var(--dcr-gold-soft);
+}
+
+/* ========================= BANNER ========================= */
+.dcr-inv-banner {
+  padding: 4.5rem 0 3.5rem;
+  background: linear-gradient(135deg, var(--dcr-navy), var(--dcr-navy-soft));
+  background-image:
+    radial-gradient(60% 100% at 90% 0%, rgba(198, 161, 91, 0.16), transparent 60%),
+    linear-gradient(135deg, var(--dcr-navy), var(--dcr-navy-soft));
+  color: #fff;
+}
+
+.dcr-inv-banner h1 {
+  font-family: var(--dcr-font-display);
+  font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+  margin-bottom: 0.6rem;
+}
+
+.dcr-inv-banner p {
+  color: #c4cbdb;
+  font-size: 1.02rem;
+  max-width: 560px;
+  margin-bottom: 0;
+}
+
+/* ========================= BODY LAYOUT ========================= */
+.dcr-inv-body {
+  padding: 3rem 0 5.5rem;
+  font-family: var(--dcr-font-body);
+}
+
+.dcr-inv-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.dcr-inv-count {
+  color: var(--dcr-slate);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.dcr-inv-count strong {
+  color: var(--dcr-navy);
+}
+
+/* ========================= CAR CARD ========================= */
+.dcr-inv-card {
+  background: #fff;
+  border: 1px solid var(--dcr-line);
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dcr-inv-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 40px -22px rgba(20, 33, 61, 0.3);
+}
+
+.dcr-inv-img-wrap {
+  position: relative;
+  height: 170px;
+  overflow: hidden;
+}
+
+.dcr-inv-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.dcr-inv-card:hover .dcr-inv-img-wrap img {
+  transform: scale(1.08);
+}
+
+.dcr-inv-type-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--dcr-navy);
+  color: #fff;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+}
+
+.dcr-status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem 0.3rem 0.5rem;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+.dcr-status-badge i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dcr-status-badge--available {
+  background: rgba(47, 143, 91, 0.14);
+  color: var(--dcr-green);
+}
+
+.dcr-status-badge--available i {
+  background: var(--dcr-green);
+}
+
+.dcr-status-badge--rented {
+  background: rgba(185, 121, 31, 0.15);
+  color: var(--dcr-amber);
+}
+
+.dcr-status-badge--rented i {
+  background: var(--dcr-amber);
+}
+
+.dcr-inv-card-body {
+  padding: 1.2rem 1.35rem 1.4rem;
+}
+
+.dcr-inv-card-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.dcr-inv-card-heading h3 {
+  font-family: var(--dcr-font-display);
+  font-size: 1.08rem;
+  color: var(--dcr-navy);
+  margin: 0;
+}
+
+.dcr-inv-brand {
+  font-size: 0.78rem;
+  color: var(--dcr-slate);
+  white-space: nowrap;
+}
+
+.dcr-inv-specs {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.6rem;
+  padding: 0;
+  margin: 0 0 1.1rem;
+}
+
+.dcr-inv-specs li {
+  font-size: 0.78rem;
+  color: var(--dcr-slate);
+  background: var(--dcr-ivory);
+  border: 1px solid var(--dcr-line);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.dcr-inv-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dcr-inv-price {
+  font-family: var(--dcr-font-display);
+  font-size: 1.25rem;
+  color: var(--dcr-navy);
+  font-weight: 700;
+}
+
+.dcr-inv-price small {
+  font-family: var(--dcr-font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--dcr-slate);
+}
+
+.dcr-btn-outline-sm {
+  border: 1.5px solid var(--dcr-navy);
+  color: var(--dcr-navy);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  transition: background 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+}
+
+.dcr-btn-outline-sm:hover:not(:disabled) {
+  background: var(--dcr-navy);
+  color: #fff;
+}
+
+.dcr-btn-outline-sm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ========================= EMPTY STATE ========================= */
+.dcr-inv-empty {
+  text-align: center;
+  background: #fff;
+  border: 1px dashed var(--dcr-line);
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  color: var(--dcr-slate);
+}
+
+.dcr-inv-empty svg {
+  color: var(--dcr-gold);
+  margin-bottom: 1rem;
+}
+
+.dcr-inv-empty h3 {
+  font-family: var(--dcr-font-display);
+  color: var(--dcr-navy);
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.dcr-inv-empty p {
+  margin-bottom: 1.5rem;
+}
+
+.dcr-btn-outline-lg {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.65rem 1.6rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--dcr-navy);
+  color: var(--dcr-navy);
+  background: transparent;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.dcr-btn-outline-lg:hover {
+  background: var(--dcr-navy);
+  color: #fff;
+}
+
+/* ========================= RESPONSIVE ========================= */
+@media (max-width: 575.98px) {
+  .dcr-inv-banner {
+    padding: 3.5rem 0 2.75rem;
+    text-align: center;
+  }
+  .dcr-inv-banner p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

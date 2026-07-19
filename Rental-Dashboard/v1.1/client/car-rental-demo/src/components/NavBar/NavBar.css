@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Navbar.css — Demo Car Rental
+   Shared brand tokens are declared on :root here AND in Cards.css / Home.css.
+   Values are identical across files so it is safe for all three to load
+   together on one page.
+   ========================================================================== */
+
+:root {
+  --dcr-navy: #14213d;
+  --dcr-navy-soft: #1f325a;
+  --dcr-gold: #c6a15b;
+  --dcr-gold-soft: #e3c98a;
+  --dcr-ivory: #faf9f6;
+  --dcr-slate: #5b6b7c;
+  --dcr-ink: #1a1f2b;
+  --dcr-line: #e7e2d8;
+  --dcr-font-display: "Playfair Display", Georgia, serif;
+  --dcr-font-body: "Inter", "Segoe UI", sans-serif;
+}
+
+.dcr-navbar {
+  background: rgba(250, 249, 246, 0.92);
+  backdrop-filter: blur(10px);
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid transparent;
+  transition: box-shadow 0.35s ease, padding 0.35s ease, border-color 0.35s ease;
+  font-family: var(--dcr-font-body);
+}
+
+.dcr-navbar--scrolled {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom-color: var(--dcr-line);
+  box-shadow: 0 8px 24px -12px rgba(20, 33, 61, 0.25);
+}
+
+/* Brand / logo */
+.dcr-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+
+.dcr-brand-icon {
+  color: var(--dcr-navy);
+  display: inline-flex;
+  transition: transform 0.3s ease;
+}
+
+.dcr-brand:hover .dcr-brand-icon {
+  transform: translateY(-2px);
+}
+
+.dcr-brand-text {
+  font-family: var(--dcr-font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+  color: var(--dcr-navy);
+}
+
+.dcr-brand-text strong {
+  color: var(--dcr-gold);
+  font-weight: 700;
+}
+
+/* Nav links */
+.dcr-nav-list .nav-link {
+  position: relative;
+  color: var(--dcr-navy);
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  padding: 0.5rem 0.9rem;
+  transition: color 0.25s ease;
+}
+
+.dcr-nav-list .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0.25rem;
+  height: 2px;
+  background: var(--dcr-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.dcr-nav-list .nav-link:hover,
+.dcr-nav-list .nav-link.active {
+  color: var(--dcr-navy);
+}
+
+.dcr-nav-list .nav-link:hover::after,
+.dcr-nav-list .nav-link.active::after {
+  transform: scaleX(1);
+}
+
+/* CTA button */
+.dcr-btn-gold {
+  background: linear-gradient(135deg, var(--dcr-gold-soft), var(--dcr-gold));
+  color: var(--dcr-navy);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.35rem;
+  border-radius: 999px;
+  border: none;
+  box-shadow: 0 6px 16px -6px rgba(198, 161, 91, 0.7);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dcr-btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -6px rgba(198, 161, 91, 0.85);
+  color: var(--dcr-navy);
+}
+
+@media (max-width: 991.98px) {
+  .dcr-navbar-collapse-wrap {
+    background: var(--dcr-ivory);
+  }
+  .dcr-nav-list .nav-link::after {
+    display: none;
+  }
+}

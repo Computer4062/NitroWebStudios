@@ -1,0 +1,344 @@
+/* ==========================================================================
+   Services.css — Demo Car Rental
+   Same brand tokens as the rest of the app (safe to duplicate).
+   ========================================================================== */
+
+:root {
+  --dcr-navy: #14213d;
+  --dcr-navy-soft: #1f325a;
+  --dcr-gold: #c6a15b;
+  --dcr-gold-soft: #e3c98a;
+  --dcr-ivory: #faf9f6;
+  --dcr-slate: #5b6b7c;
+  --dcr-ink: #1a1f2b;
+  --dcr-line: #e7e2d8;
+  --dcr-font-display: "Playfair Display", Georgia, serif;
+  --dcr-font-body: "Inter", "Segoe UI", sans-serif;
+}
+
+.dcr-services-page {
+  background: var(--dcr-ivory);
+  font-family: var(--dcr-font-body);
+}
+
+.dcr-eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--dcr-gold);
+  margin-bottom: 0.75rem;
+}
+
+.dcr-eyebrow--light {
+  color: var(--dcr-gold-soft);
+}
+
+.dcr-section-heading {
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.dcr-section-heading h2 {
+  font-family: var(--dcr-font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--dcr-navy);
+  margin-bottom: 0.6rem;
+}
+
+/* ========================= HERO ========================= */
+.dcr-services-hero {
+  position: relative;
+  padding: 7rem 0 6rem;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+
+.dcr-services-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(15, 26, 48, 0.92) 0%,
+    rgba(15, 26, 48, 0.72) 45%,
+    rgba(20, 33, 61, 0.55) 100%
+  );
+}
+
+.dcr-services-hero-content {
+  position: relative;
+  max-width: 620px;
+}
+
+.dcr-services-hero-content h1 {
+  font-family: var(--dcr-font-display);
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.dcr-services-hero-content p {
+  color: #d6dbe6;
+  font-size: 1.05rem;
+  margin-bottom: 0;
+}
+
+/* ========================= SERVICE BLOCKS ========================= */
+.dcr-services-list {
+  padding: 5.5rem 0 2rem;
+}
+
+.dcr-service-block {
+  display: flex;
+  align-items: center;
+  gap: 3.5rem;
+  padding: 2.5rem 0;
+}
+
+.dcr-service-block:not(:last-child) {
+  border-bottom: 1px solid var(--dcr-line);
+  margin-bottom: 1.5rem;
+}
+
+.dcr-service-block--reverse {
+  flex-direction: row-reverse;
+}
+
+.dcr-service-media,
+.dcr-service-content {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+
+/* Image collage: one large + two stacked smaller */
+.dcr-service-media {
+  display: flex;
+  gap: 0.9rem;
+}
+
+.dcr-service-media-main {
+  flex: 1 1 62%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 48px -28px rgba(20, 33, 61, 0.4);
+}
+
+.dcr-service-media-main img {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.dcr-service-block:hover .dcr-service-media-main img {
+  transform: scale(1.04);
+}
+
+.dcr-service-media-side {
+  flex: 1 1 38%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.dcr-service-media-side img {
+  width: 100%;
+  height: 100%;
+  min-height: 150px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 16px 32px -22px rgba(20, 33, 61, 0.35);
+  transition: transform 0.5s ease;
+}
+
+.dcr-service-block:hover .dcr-service-media-side img {
+  transform: scale(1.05);
+}
+
+/* Content */
+.dcr-service-content h2 {
+  font-family: var(--dcr-font-display);
+  font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+  color: var(--dcr-navy);
+  margin-bottom: 0.9rem;
+}
+
+.dcr-service-content p {
+  color: var(--dcr-slate);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  margin-bottom: 1.4rem;
+}
+
+.dcr-service-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.dcr-service-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  color: var(--dcr-ink);
+}
+
+.dcr-service-features svg {
+  flex: 0 0 auto;
+  color: var(--dcr-gold);
+  background: rgba(198, 161, 91, 0.14);
+  border-radius: 50%;
+  padding: 4px;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+}
+
+.dcr-btn-outline-lg {
+  display: inline-block;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.65rem 1.6rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--dcr-navy);
+  color: var(--dcr-navy);
+  background: transparent;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.dcr-btn-outline-lg:hover {
+  background: var(--dcr-navy);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ========================= WHY US ========================= */
+.dcr-services-why {
+  padding: 5rem 0;
+  background: #fff;
+}
+
+.dcr-why-card {
+  background: var(--dcr-ivory);
+  border: 1px solid var(--dcr-line);
+  border-radius: 14px;
+  padding: 1.75rem 1.5rem;
+  height: 100%;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.dcr-why-card:hover {
+  border-color: var(--dcr-gold);
+  transform: translateY(-4px);
+}
+
+.dcr-why-card h3 {
+  font-family: var(--dcr-font-display);
+  font-size: 1.05rem;
+  color: var(--dcr-navy);
+  margin-bottom: 0.5rem;
+}
+
+.dcr-why-card p {
+  color: var(--dcr-slate);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+/* ========================= CTA ========================= */
+.dcr-services-cta {
+  position: relative;
+  padding: 5.5rem 0;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+
+.dcr-services-cta-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(20, 33, 61, 0.92), rgba(31, 50, 90, 0.86));
+}
+
+.dcr-services-cta-content {
+  position: relative;
+}
+
+.dcr-services-cta-content h2 {
+  font-family: var(--dcr-font-display);
+  font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+  margin-bottom: 0.75rem;
+}
+
+.dcr-services-cta-content p {
+  color: #d6dbe6;
+  margin-bottom: 2rem;
+  font-size: 1.02rem;
+}
+
+.dcr-btn-gold-lg {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--dcr-gold-soft), var(--dcr-gold));
+  color: var(--dcr-navy);
+  font-weight: 600;
+  font-size: 0.97rem;
+  padding: 0.75rem 1.85rem;
+  border-radius: 999px;
+  border: none;
+  text-decoration: none;
+  box-shadow: 0 10px 24px -8px rgba(198, 161, 91, 0.75);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dcr-btn-gold-lg:hover {
+  transform: translateY(-3px);
+  color: var(--dcr-navy);
+  box-shadow: 0 14px 28px -8px rgba(198, 161, 91, 0.9);
+}
+
+/* ========================= RESPONSIVE ========================= */
+@media (max-width: 991.98px) {
+  .dcr-service-block,
+  .dcr-service-block--reverse {
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .dcr-service-media {
+    width: 100%;
+  }
+
+  .dcr-service-media-main img,
+  .dcr-service-media-side img {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .dcr-services-hero {
+    padding: 5rem 0 4rem;
+    text-align: center;
+  }
+
+  .dcr-services-hero-content {
+    margin: 0 auto;
+  }
+
+  .dcr-service-media {
+    flex-direction: column;
+  }
+
+  .dcr-service-media-side {
+    flex-direction: row;
+  }
+}
