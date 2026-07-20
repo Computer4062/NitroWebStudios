@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from "../../api.jsx"
 
 const Login = () => {
 	const navigate = useNavigate();
@@ -8,21 +9,22 @@ const Login = () => {
 	// Check if user is already logged in
 	useEffect(() => {
 		const checkUserAuth = async() => {
-		    setLoading(true); // 1. Start the spinn
+		    setLoading(true); // 1. Start the spinner
 
 			try{
-				const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
-					method: 'GET',
-					credentials: 'include'
+				const response = await api.get("/api/accounts/check-auth", {
+					withCredentials: true
 				});
 
-				if(response.status !== 401){
-					// If not logged in, kick them to login page
-					navigate("/dashboard");
-				}
+				// If we got here without a 401, the user is logged in
+				navigate("/dashboard");
 
 			} catch(error) {
-				console.error(error.message);
+				if (error.response?.status === 401) {
+					// Not logged in — stay on the login page, this is expected
+				} else {
+					console.error(error.message);
+				}
 			} finally {
         	    setLoading(false); // 2. Stop the spinner (happens whether success or error)
             }
@@ -39,37 +41,33 @@ const Login = () => {
         e.preventDefault();
 
         const endpoint = step === 1 
-            ? "http://localhost:3000/api/accounts/login-step-1" 
-            : "http://localhost:3000/api/accounts/login-step-2";
+            ? "/api/accounts/login-step-1" 
+            : "/api/accounts/login-step-2";
 
         setLoading(true); // Start the spinner for this step's request
 
         try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-                credentials: 'include'
+            const response = await api.post(endpoint, formData, {
+                withCredentials: true
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                if (step === 1) {
-                    setStep(2); // Success! Now show the code input
-                    setError('');
-                } else {
-                    window.location.href = "/dashboard"; // Fully logged in!
-                    return; // keep spinner on while we navigate away
-                }
+            if (step === 1) {
+                setStep(2); // Success! Now show the code input
+                setError('');
             } else {
-                // If code is wrong or login fails, reboot the page/state
-                alert(data.message || "Authentication failed. Restarting...");
-                window.location.reload();
-                return; // keep spinner on while we reload
+                window.location.href = "/dashboard"; // Fully logged in!
+                return; // keep spinner on while we navigate away
             }
         } catch (err) {
-            setError("Server connection failed");
+            if (err.response) {
+                // Server responded with an error status (login/code failure)
+                alert(err.response.data?.message || "Authentication failed. Restarting...");
+                window.location.reload();
+                return; // keep spinner on while we reload
+            } else {
+                // No response at all — network/connection issue
+                setError("Server connection failed");
+            }
         } finally {
             setLoading(false); // Stop spinner (unless we returned early above)
         }
@@ -134,7 +132,6 @@ const Login = () => {
                                 {step === 1 ? "Sending Code..." : "Verifying..."}
                             </>
                         ) : (
-                            // Normal state: Show text based on which step the user is on
                             step === 1 ? "Sign in" : "Verify & Login"
                         )}
                     </button>

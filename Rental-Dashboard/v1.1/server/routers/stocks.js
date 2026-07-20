@@ -241,7 +241,7 @@ router.put('/user/update/:id', upload.array('images'), async (req, res) => {
 
 // ------------------------------------------------------------------------------------------------- //
 // Delete a product listing
-router.delete('/admin/delete/:id', async (req, res) => {
+router.delete('/user/delete/:id', async (req, res) => {
     try {
         const { id } = req.params;
 

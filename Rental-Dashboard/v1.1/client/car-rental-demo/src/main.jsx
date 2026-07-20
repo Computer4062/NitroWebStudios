@@ -24,6 +24,7 @@ import Profile from './pages/dashboard/Profile/Profile.jsx'
 import MyPosts from './pages/dashboard/Profile/MyPosts.jsx'
 import EMPTY from "./pages/dashboard/empty_page/EMPTY.jsx"
 import AdminGuard from './utilities/AdminGuard.jsx'
+import UserGuard from './utilities/UserGuard.jsx'
 
 
 createRoot(document.getElementById('root')).render(
@@ -47,7 +48,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/dashboard/logs" element={<Logs />}/>
       <Route path="/dashboard/database" element={<DataBase />}/>
 
-      <Route path="/dashboard/accounts" element={ <AdminGuard> <Accounts /> </AdminGuard>}/>
+      <Route path="/dashboard/accounts" element={<Accounts />}/>
       <Route path="/dashboard/profile" element={<Profile />}/>
       <Route path="/dashboard/mylistings" element={<MyPosts />}/>
 

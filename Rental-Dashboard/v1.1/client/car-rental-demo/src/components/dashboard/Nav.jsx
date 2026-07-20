@@ -1,48 +1,44 @@
 import {useState, useEffect} from "react"
 import { useNavigate} from "react-router-dom";
+import api from "../../api.jsx";
 
 import "./Nav.css"
 
 function Nav() {
-	const navigate = useNavigate();
+  const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-	const checkUserAuth = async() => {
-		try{
-			const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
-				method: 'GET',
-				credentials: 'include'
-			});
+    const checkUserAuth = async () => {
+      try {
+        const response = await api.get('/api/accounts/check-auth', {
+          withCredentials: true
+        });
 
-			if(response.status === 401){
-				// If not logged in, kick them to login page
-				navigate("/login");
+        // axios already parses the JSON body into response.data — no .json() needed
+        setIsAdmin(response.data.admin);
+
+      } catch (error) {
+        // Axios throws here on 401 (or any non-2xx), so this is the correct
+        // place to handle "not logged in"
+        navigate("/login");
       }
+    }
 
-      const data = await response.json();
-      setIsAdmin(data.admin);
-
-		} catch(error) {
-			navigate("/login");
-		}
-	}
-
-	checkUserAuth();
+    checkUserAuth();
   }, [navigate]);
 
-	const handleLogout = async() => {
-		try{
-			await fetch('http://localhost:3000/api/accounts/user/logout', {
-				method: 'POST',
-				credentials: 'include'
-			});
+  const handleLogout = async () => {
+    try {
+      await api.post('/api/accounts/user/logout', {}, {
+        withCredentials: true
+      });
 
-			navigate("/login");
-		} catch(error) {
-			console.error("Logout failed ", error);
-		}
-	}
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed ", error);
+    }
+  }
 
   return (
     <>

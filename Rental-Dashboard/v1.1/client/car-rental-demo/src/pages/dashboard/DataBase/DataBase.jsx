@@ -1,5 +1,6 @@
 import {useState, useEffect} from "react"
 import { Link } from 'react-router-dom';
+import api from "../../../api.jsx"
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
@@ -7,42 +8,38 @@ import Nav from "../../../components/dashboard/Nav.jsx"
 function Database() {
 
 	const handleDownloadDatabase = async () => {
-		try {
-			const response = await fetch('http://localhost:3000/api/database/admin/download', {
-				method: 'GET',
-				credentials: 'include',
-			});
+	try {
+		const response = await api.get('/api/database/admin/download', {
+		responseType: 'blob', // ⚡ CRITICAL: Tells Axios to handle this as a downloadable file stream
+		withCredentials: true
+		});
 
-			if (!response.ok) {
-				throw new Error(`Download failed: ${response.statusText}`);
-			}
+		// 1. Axios already gives you the parsed Blob directly on response.data
+		const blob = response.data;
 
-			// 1. Process the response as a 'Blob' (Binary Large Object)
-			const blob = await response.blob();
+		// 2. Create a temporary URL for the blob
+		const url = window.URL.createObjectURL(blob);
 
-			// 2. Create a temporary URL for the blob
-			const url = window.URL.createObjectURL(blob);
+		// 3. Create a hidden <a> tag to trigger the download
+		const link = document.createElement('a');
+		link.href = url;
 
-			// 3. Create a hidden <a> tag to trigger the download
-			const link = document.createElement('a');
-			link.href = url;
-			
-			// Give the file a timestamped name
-			const timestamp = new Date().toISOString().split('T');
-			link.setAttribute('download', `vehicle_db_backup_${timestamp}.json`);
+		// Give the file a timestamped name
+		const timestamp = new Date().toISOString().split('T')[0];
+		link.setAttribute('download', `vehicle_db_backup_${timestamp}.json`);
 
-			// 4. Append to body, click it, and remove it
-			document.body.appendChild(link);
-			link.click();
-			link.parentNode.removeChild(link);
+		// 4. Append to body, click it, and remove it
+		document.body.appendChild(link);
+		link.click();
+		link.parentNode.removeChild(link);
 
-			// 5. Clean up the URL object to save memory
-			window.URL.revokeObjectURL(url);
+		// 5. Clean up the URL object to save memory
+		window.URL.revokeObjectURL(url);
 
-		} catch (error) {
-			console.error("Error downloading database:", error);
-			alert("Failed to download database. Check console for details.");
-		}
+	} catch (error) {
+		console.error("Error downloading database:", error);
+		alert("Failed to download database. Check console for details.");
+	}
 	};
 
   return (

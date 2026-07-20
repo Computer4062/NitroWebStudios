@@ -1,22 +1,55 @@
-import {useState, useEffect} from "react"
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom";
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
+import api from "../../../api.jsx"
 
 function Accounts() {
+	const navigate = useNavigate();
 	const [users, setUsers] = useState([]);
+	const [isAdmin, setIsAdmin] = useState(false);
 
-	// Fetch all users on load
+	// Confirm the logged-in user is an admin before allowing access to this page
 	useEffect(() => {
-	fetchUsers();
-	}, []);
+		const checkUserAuth = async () => {
+			try {
+				const response = await api.get('/api/accounts/check-auth', {
+					withCredentials: true
+				});
 
+				if (response.data.admin === false) {
+					// Authenticated, but not an admin — kick them back to the homepage
+					navigate("/");
+					return;
+				}
+
+				setIsAdmin(response.data.admin);
+
+			} catch (error) {
+				// Axios throws here on 401 (or any non-2xx) — not logged in at all
+				navigate("/login");
+			}
+		}
+
+		checkUserAuth();
+	}, [navigate]);
+
+	// Fetch all users on load — pulled out of useEffect so it can be reused
+	// after registering a new user (fixes a bug where the original code called
+	// fetchUsers() from inside handleRegisterSubmit, where it wasn't in scope)
 	const fetchUsers = async () => {
-	const res = await fetch("http://localhost:3000/api/accounts/user/users", { credentials: 'include' });
-	const data = await res.json();
-	setUsers(data);
+		try {
+			const res = await api.get("/api/accounts/user/users", { withCredentials: true });
+			setUsers(res.data);
+		} catch (error) {
+			console.error("Failed to fetch users:", error);
+		}
 	};
+
+	useEffect(() => {
+		fetchUsers();
+	}, []);
 
 	const [selectedUser, setSelectedUser] = useState(null); // Tracks which user is being viewed
 	const [editedEmail, setEditedEmail] = useState("");   // Tracks the email in the preview card
@@ -30,32 +63,36 @@ function Accounts() {
 	// Function to update email from the card
 	const handleCardEmailUpdate = async () => {
 		try {
-			const response = await fetch(`http://localhost:3000/api/admin/update-email/${selectedUser._id}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email: editedEmail }),
-				credentials: 'include'
-			});
+			const response = await api.put(
+				`/api/accounts/admin/update-email/${selectedUser.id}`,
+				{ email: editedEmail },
+				{ withCredentials: true }
+			);
 
-			if (response.ok) {
+			if (response.status === 200) {
 				alert("Email updated successfully!");
 				// Update the local list so the table stays in sync
-				setUsers(users.map(u => u._id === selectedUser._id ? { ...u, email: editedEmail } : u));
+				setUsers(users.map(u => u.id === selectedUser.id ? { ...u, email: editedEmail } : u));
 			}
 		} catch (err) {
 			console.error("Update failed", err);
+			alert("Failed to update email.");
 		}
 	};
 
-	// Function for deleting exsisting accounts
+	// Function for deleting existing accounts
 	const handleDeleteUser = async (id, username) => {
-	if (window.confirm(`Are you sure you want to delete ${username}?`)) {
-		await fetch(`http://localhost:3000/api/accounts/admin/delete-user/${id}`, { 
-			method: 'DELETE', 
-			credentials: 'include' 
-		});
-		setUsers(users.filter(u => u._id !== id));
-	}
+		if (window.confirm(`Are you sure you want to delete ${username}?`)) {
+			try {
+				await api.delete(`/api/accounts/admin/delete-user/${id}`, {
+					withCredentials: true
+				});
+				setUsers(users.filter(u => u.id !== id));
+			} catch (error) {
+				console.error("Delete failed:", error);
+				alert("Failed to delete user.");
+			}
+		}
 	};
 
 	// Function for registering new accounts
@@ -69,27 +106,22 @@ function Accounts() {
 	// Function for registering users
 	const handleRegisterSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true); // 1. Start the spinn
+		setLoading(true); // 1. Start the spinner
 
 		try {
-			const response = await fetch("http://localhost:3000/api/accounts/admin/register", {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(newUser),
-				credentials: 'include'
-			});
+			const response = await api.post(
+				"/api/accounts/admin/register",
+				newUser,
+				{ withCredentials: true }
+			);
 
-			const data = await response.json();
-			if (response.ok) {
-				alert("User registered successfully!");
-				setShowRegisterModal(false); // Close modal
-				setNewUser({ username: '', password: '', email: '', first_name: '', last_name: '', admin: false }); // Reset
-				fetchUsers(); // Refresh your table list
-			} else {
-				alert(data.message);
-			}
+			alert("User registered successfully!");
+			setShowRegisterModal(false); // Close modal
+			setNewUser({ username: '', password: '', email: '', first_name: '', last_name: '', admin: false }); // Reset
+			fetchUsers(); // Refresh your table list
 		} catch (err) {
-			alert("Registration failed");
+			console.error("Registration failed:", err);
+			alert(err.response?.data?.message || "Registration failed");
 		} finally {
         	setLoading(false); // 2. Stop the spinner (happens whether success or error)
     	}
@@ -116,16 +148,19 @@ function Accounts() {
 		borderRadius: '15px'
 	}
 
+	// Don't render the page content until the admin check has resolved
+	if (!isAdmin) return null;
+
   return (
 	<>
 	  <Dash />
 
-	  <div class="container-fluid">
-	  <div class="row">
+	  <div className="container-fluid">
+	  <div className="row">
 
 		<Nav/>
 
-		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
+		<main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
 
 			{/* Header Section: Amazon-style Breadcrumbs & Actions */}
 			<div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
@@ -216,12 +251,9 @@ function Accounts() {
 						<h6 className="mb-0 fw-bold text-primary">User Detailed Profile</h6>
 						<button type="button" className="btn-close" onClick={() => setSelectedUser(null)}></button>
 					</div>
-					<div className="card-body p-3 p-md-4"> {/* Added p-3 for mobile, p-md-4 for desktop */}
-						{/* The main container row. Added g-4 for vertical gap when stacked */}
+					<div className="card-body p-3 p-md-4">
 						<div className="row align-items-center g-4 g-md-0"> 
 							
-							{/* Left Side (Details) becomes Bottom on mobile */}
-							{/* Changed from col-md-8 to col-12, col-md-8 */}
 							<div className="col-12 col-md-8 order-2 order-md-1"> 
 								<div className="row g-3">
 									<div className="col-6">
@@ -232,13 +264,12 @@ function Accounts() {
 										<label className="small text-muted">Last Name</label>
 										<p className="fw-bold mb-0">{selectedUser.last_name || 'N/A'}</p>
 									</div>
-									<div className="col-12 col-sm-6"> {/* Combined username/text secondary on mobile */}
+									<div className="col-12 col-sm-6">
 										<label className="small text-muted">Username</label>
 										<p className="fw-bold text-secondary mb-0">@{selectedUser.username}</p>
 									</div>
 									<div className="col-12">
 										<label className="small text-muted">Email Address</label>
-										{/* Input group - changed w-75 to w-100 for mobile, w-md-75 for desktop */}
 										<div className="input-group w-100 w-md-75">
 											<input 
 												type="email" 
@@ -252,13 +283,10 @@ function Accounts() {
 								</div>
 							</div>
 
-							{/* Right Side (Image/Status) becomes Top on mobile */}
-							{/* Changed from col-md-4 to col-12, col-md-4 */}
-							{/* Also removed border-start which looked bad on mobile */}
 							<div className="col-12 col-md-4 text-center order-1 order-md-2 border-md-start"> 
 								<img 
 									src={`http://localhost:3000/public/uploads/profiles/${selectedUser.profile_img}`} 
-									className="rounded-circle img-thumbnail shadow-sm mb-3 mb-md-2" /* Adjusted margin */
+									className="rounded-circle img-thumbnail shadow-sm mb-3 mb-md-2"
 									style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
 									alt="Profile"
 								/>
@@ -266,7 +294,6 @@ function Accounts() {
 								{selectedUser.admin && <span className="badge bg-danger me-1">Admin</span>}
 								{selectedUser.technician && <span className="badge bg-info me-1">Technician</span>}
 								
-								{/* Only shows if they are neither an Admin nor a Technician */}
 								{!selectedUser.admin && !selectedUser.technician && (
 									<span className="badge bg-primary">Editor</span>
 								)}
@@ -278,46 +305,45 @@ function Accounts() {
 			)}
 
 			{/* User List Table */}
-			<div class="card border-0 shadow-sm">
-				<div class="table-responsive">
-					<table class="table table-hover align-middle mb-0">
-						<thead class="bg-light text-muted small text-uppercase">
+			<div className="card border-0 shadow-sm">
+				<div className="table-responsive">
+					<table className="table table-hover align-middle mb-0">
+						<thead className="bg-light text-muted small text-uppercase">
 							<tr>
 								<th>User</th>
 								<th>Role</th>
-								<th class="text-end">Actions</th>
+								<th className="text-end">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							{users.map((user) => (
-								<tr key={user._id}>
+								<tr key={user.id}>
 									<td>
-										<div class="d-flex align-items-center">
-											<img src={`http://localhost:3000/public/uploads/profiles/${user.profile_img}`} class="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
-											<span class="fw-bold text-dark">{user.username}</span>
+										<div className="d-flex align-items-center">
+											<img src={`http://localhost:3000/public/uploads/profiles/${user.profile_img}`} className="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
+											<span className="fw-bold text-dark">{user.username}</span>
 										</div>
 									</td>
 									<td>
 										<div>
 											{user.admin && <span className="badge bg-danger me-1">Admin</span>}
 											
-											{/* Only shows if they are neither an Admin nor a Technician */}
 											{!user.admin && (
 												<span className="badge bg-primary">Editor</span>
 											)}
 										</div>
 									</td>
-									<td class="text-end">
+									<td className="text-end">
 										<button 
-											class="btn btn-sm btn-outline-primary me-2" 
+											className="btn btn-sm btn-outline-primary me-2" 
 											onClick={() => handleViewProfile(user)}
 										>
 											View Profile
 										</button>
 										{!user.admin && (
 										<button 
-											class="btn btn-sm btn-outline-danger" 
-											onClick={() => handleDeleteUser(user._id, user.username)}
+											className="btn btn-sm btn-outline-danger" 
+											onClick={() => handleDeleteUser(user.id, user.username)}
 										>
 											Delete
 										</button>

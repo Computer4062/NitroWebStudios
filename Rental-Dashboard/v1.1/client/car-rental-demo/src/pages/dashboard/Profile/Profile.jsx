@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from "react"
-
+import api from "../../../api.jsx"
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
 
@@ -7,26 +7,23 @@ function Profile() {
   const [profile, setProfile] = useState([]);
 
   // To get information about users profile through the backend
-    useEffect(() => {
-	const GetProfile = async() => {
-		try{
-			const response = await fetch("http://localhost:3000/api/accounts/user/get-profile", {
-				method: 'GET',
-				credentials: 'include'
-			});
+  useEffect(() => {
+    const GetProfile = async () => {
+      try {
+        const response = await api.get("/api/accounts/user/get-profile", {
+          withCredentials: true
+        });
 
-      const data = await response.json();
-      setProfile(data);;
+        setProfile(response.data);
 
-		} catch(error) {
-			console.error(`Internal server error: ${error}`);
-		} finally {
+      } catch (error) {
+        console.error(`Internal server error: ${error}`);
+      } finally {
 
-
+      }
     }
-	}
 
-	GetProfile();
+    GetProfile();
   }, []);
 
     const [profileData, setProfileData] = useState({

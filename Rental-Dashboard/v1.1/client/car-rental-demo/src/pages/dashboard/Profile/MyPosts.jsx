@@ -179,7 +179,7 @@ function MyPosts() {
 		if (!confirmDelete) return;
 
 		try {
-			const response = await api.delete(`/api/stocks/admin/delete/${id}`, {
+			const response = await api.delete(`/api/stocks/user/delete/${id}`, {
 				withCredentials: true
 			});
 

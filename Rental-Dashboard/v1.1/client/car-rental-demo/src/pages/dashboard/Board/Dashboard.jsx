@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Dash from "../../../components/dashboard/Dash.jsx";
 import Nav from "../../../components/dashboard/Nav.jsx";
+import api from "../../../api.jsx"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 import "./Dashboard.css"
@@ -14,12 +15,11 @@ const AnalyticsDashboard = () => {
 
 // 1. Fetch the exact JSON dataset payload layout
   useEffect(() => {
-    fetch("http://localhost:3000/api/analytics/user/top-products", {
-				method: 'GET',
-				credentials: 'include'
-    }) 
-      .then(res => res.json())
-      .then(data => {
+    api.get("/api/analytics/user/top-products", {
+      withCredentials: true
+    })
+      .then(res => {
+        const data = res.data;
         setAnalyticsData(data);
         if (data && data.length > 0) {
           setSelectedProduct(data); // Default selection to the first product (e.g., "GEN 2")
