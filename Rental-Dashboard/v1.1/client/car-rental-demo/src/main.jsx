@@ -23,9 +23,6 @@ import Accounts from './pages/dashboard/Accounts/Accounts.jsx'
 import Profile from './pages/dashboard/Profile/Profile.jsx'
 import MyPosts from './pages/dashboard/Profile/MyPosts.jsx'
 import EMPTY from "./pages/dashboard/empty_page/EMPTY.jsx"
-import AdminGuard from './utilities/AdminGuard.jsx'
-import UserGuard from './utilities/UserGuard.jsx'
-
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -37,22 +34,22 @@ createRoot(document.getElementById('root')).render(
       <Route path="/services" element={<Services />} />
       <Route path="/contacts" element={<Contacts />} />
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/nws-dash/login" element={<Login />} />
+      <Route path="/nws-dash/dashboard" element={<Dashboard />} />
 
-      <Route path="/dashboard/items" element={<ItemsList />} />
-      <Route path="/dashboard/items/add" element={<AddItems />} />
+      <Route path="/nws-dash/dashboard/items" element={<ItemsList />} />
+      <Route path="/nws-dash/dashboard/items/add" element={<AddItems />} />
       
-      <Route path="/dashboard/items/editor" element={<Editor />} />
-      <Route path="/dashboard/info" element={<HelpCenter />} />
-      <Route path="/dashboard/logs" element={<Logs />}/>
-      <Route path="/dashboard/database" element={<DataBase />}/>
+      <Route path="/nws-dash/dashboard/items/editor" element={<Editor />} />
+      <Route path="/nws-dash/dashboard/info" element={<HelpCenter />} />
+      <Route path="/nws-dash/dashboard/logs" element={<Logs />}/>
+      <Route path="/nws-dash/dashboard/database" element={<DataBase />}/>
 
-      <Route path="/dashboard/accounts" element={<Accounts />}/>
-      <Route path="/dashboard/profile" element={<Profile />}/>
-      <Route path="/dashboard/mylistings" element={<MyPosts />}/>
+      <Route path="/nws-dash/dashboard/accounts" element={<Accounts />}/>
+      <Route path="/nws-dash/dashboard/profile" element={<Profile />}/>
+      <Route path="/nws-dash/dashboard/mylistings" element={<MyPosts />}/>
 
-      <Route path="/dashboard/empty" element={<EMPTY />}/>
+      <Route path="/nws-dash/dashboard/empty" element={<EMPTY />}/>
     </Routes>
   </BrowserRouter>
 )

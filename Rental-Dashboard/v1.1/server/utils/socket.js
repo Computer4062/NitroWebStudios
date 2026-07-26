@@ -1,9 +1,15 @@
 import pool from '../db.js' // MySQL pool
 import crypto from 'crypto';
 
-// An in-memory cache to keep track of sessions that have already counted as a page view 
+// An in-memory cache to keep track of sessions that have already counted as a page view
 // for a specific path today. Format: { "sess_abc123:/inventory/124": true }
 const countedPageViews = new Set();
+
+// In-memory batching queue — accumulates increments here instead of hitting
+// the DB on every single page view. Format: { "/inventory/124": 3 }
+const pendingIncrements = new Map();
+
+const FLUSH_INTERVAL_MS = 5000; // adjust based on how "live" you need the counts to feel
 
 function formatDateString(dateInput) {
   if (!dateInput) return "";
@@ -18,36 +24,47 @@ function advanceByOneDay(dateInput) {
   return d;
 }
 
-// Generates a 24-character hex string, matching the id format used in the users table
 function generateId() {
   return crypto.randomBytes(12).toString('hex');
 }
 
 /**
- * Analytics Engine: Handles custom increment tracking and backfills missing calendar gaps
+ * Applies one path's batched increment to the database, safely.
+ * Uses a row lock (FOR UPDATE) inside a transaction so concurrent flushes
+ * or overlapping requests can never race each other on the same row.
  */
-async function handlePageViewIncrement(pagePath, isNewViewForSession) {
+async function flushPathIncrement(pagePath, incrementAmount) {
   const rightNow = new Date();
   const todayStr = formatDateString(rightNow);
 
+  const connection = await pool.getConnection();
+
   try {
-    const [rows] = await pool.query('SELECT * FROM page_visits WHERE path = ?', [pagePath]);
+    await connection.beginTransaction();
+
+    // Lock the row for the duration of this transaction — any other
+    // transaction trying to touch this same path will wait until we commit
+    const [rows] = await connection.query(
+      'SELECT * FROM page_visits WHERE path = ? FOR UPDATE',
+      [pagePath]
+    );
     let record = rows[0];
 
-    // If the path tracking page doesn't exist yet, build it out
+    // If the path tracking page doesn't exist yet, create it
     if (!record) {
-      await pool.query(
+      await connection.query(
         `INSERT INTO page_visits (id, path, todays_hits, last_visited, hits, created_at)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
           generateId(),
           pagePath,
-          isNewViewForSession ? 1 : 0, // Count it if it's a unique view session
+          incrementAmount,
           rightNow,
           JSON.stringify([]),
           rightNow
         ]
       );
+      await connection.commit();
       return;
     }
 
@@ -56,19 +73,14 @@ async function handlePageViewIncrement(pagePath, isNewViewForSession) {
     let newHitsArray = record.hits; // already parsed into a JS array by mysql2
 
     if (evaluationDateStr === todayStr) {
-      // SAME DAY: Only increment if this session hasn't loaded this specific page yet today
-      if (isNewViewForSession) {
-        newTodaysHits += 1;
-      }
+      // SAME DAY: just add the batched increment
+      newTodaysHits += incrementAmount;
     } else {
-      // NEW DAY DETECTED: Clear out yesterday's memory tracking cache
-      countedPageViews.clear();
-
+      // NEW DAY DETECTED: archive gap rows, same logic as the original
       console.log(`[Rollover] Moving to new day for path: ${pagePath}. Archiving gap rows...`);
       let isFirstIteration = true;
       const updatedHitsArray = [...newHitsArray];
 
-      // Turn pages one day at a time until catching up to today
       while (evaluationDateStr !== todayStr) {
         let finalCount = 0;
 
@@ -87,21 +99,43 @@ async function handlePageViewIncrement(pagePath, isNewViewForSession) {
       }
 
       newHitsArray = updatedHitsArray;
-
-      // Initialize today's new bucket (starts at 1 if unique session view, 0 if it was a refresh bypass)
-      newTodaysHits = isNewViewForSession ? 1 : 0;
+      newTodaysHits = incrementAmount; // today starts fresh with this flush's batch
     }
 
-    await pool.query(
+    await connection.query(
       'UPDATE page_visits SET todays_hits = ?, hits = ?, last_visited = ? WHERE id = ?',
       [newTodaysHits, JSON.stringify(newHitsArray), rightNow, record.id]
     );
 
-    console.log(`[Database Update] ${pagePath} -> todayHits: ${newTodaysHits}`);
+    await connection.commit();
+    console.log(`[Database Update] ${pagePath} -> todaysHits: ${newTodaysHits} (+${incrementAmount})`);
+
   } catch (err) {
-    console.error('CRITICAL: Database analytics processing fault:', err);
+    await connection.rollback();
+    console.error(`CRITICAL: Failed to flush increment for ${pagePath}:`, err);
+    // Put the lost increment back in the queue so it isn't silently dropped
+    pendingIncrements.set(pagePath, (pendingIncrements.get(pagePath) || 0) + incrementAmount);
+  } finally {
+    connection.release();
   }
 }
+
+/**
+ * Runs on an interval — drains the in-memory queue and writes each
+ * path's accumulated increment to the DB exactly once per flush cycle.
+ */
+async function flushAllPending() {
+  if (pendingIncrements.size === 0) return;
+
+  const snapshot = new Map(pendingIncrements);
+  pendingIncrements.clear();
+
+  for (const [pagePath, incrementAmount] of snapshot.entries()) {
+    await flushPathIncrement(pagePath, incrementAmount);
+  }
+}
+
+setInterval(flushAllPending, FLUSH_INTERVAL_MS);
 
 export const initSocket = (io) => {
   io.on('connection', (socket) => {
@@ -114,32 +148,20 @@ export const initSocket = (io) => {
       return socket.disconnect();
     }
 
-    socket.on('page_view', async (data) => {
+    socket.on('page_view', (data) => {
       const { pagePath } = data;
       if (!pagePath) return;
 
       const trackingSignature = `${sessionId}:${pagePath}`;
-      let isNewViewForSession = false;
 
       if (!countedPageViews.has(trackingSignature)) {
         countedPageViews.add(trackingSignature);
-        isNewViewForSession = true;
+        pendingIncrements.set(pagePath, (pendingIncrements.get(pagePath) || 0) + 1);
+        socket.emit('page_view_success', { path: pagePath, queued: true });
       } else {
         console.log(`[Guard active] Bypass match found for signature: ${trackingSignature}`);
+        socket.emit('page_view_success', { path: pagePath, queued: false });
       }
-
-      // 1. Process database mutation tracking mechanics
-      await handlePageViewIncrement(pagePath, isNewViewForSession);
-
-      // 2. Fetch updated count to return a verification receipt payload
-      const [rows] = await pool.query('SELECT todays_hits FROM page_visits WHERE path = ?', [pagePath]);
-      const updatedRecord = rows[0];
-
-      // Send confirmation event directly back to the active tab console
-      socket.emit('page_view_success', {
-        path: pagePath,
-        todaysHits: updatedRecord ? updatedRecord.todays_hits : 0
-      });
     });
 
     socket.on('disconnect', () => {

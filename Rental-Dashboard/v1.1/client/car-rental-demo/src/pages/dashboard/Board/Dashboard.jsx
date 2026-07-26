@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Dash from "../../../components/dashboard/Dash.jsx";
 import Nav from "../../../components/dashboard/Nav.jsx";
-import api from "../../../api.jsx"
+import api, { base_url } from "../../../api.jsx"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 import "./Dashboard.css"
@@ -22,7 +22,7 @@ const AnalyticsDashboard = () => {
         const data = res.data;
         setAnalyticsData(data);
         if (data && data.length > 0) {
-          setSelectedProduct(data); // Default selection to the first product (e.g., "GEN 2")
+          setSelectedProduct(data[0]); // Default selection to the first product
         }
       })
       .catch(err => console.error("Error fetching analytics data structure:", err));
@@ -32,32 +32,59 @@ const AnalyticsDashboard = () => {
   useEffect(() => {
     if (!selectedProduct) return;
 
-    const rawHistory = selectedProduct.hits || [];
-    const todayHits = selectedProduct.todaysHits || 0;
-    
-    // Append today's active live database metrics seamlessly into the historical timeframe matrix
+    let rawHistory = selectedProduct.hits || [];
+    if (typeof rawHistory === 'string') {
+      try {
+        rawHistory = JSON.parse(rawHistory);
+      } catch (e) {
+        rawHistory = [];
+      }
+    }
+    if (!Array.isArray(rawHistory)) rawHistory = [];
+
+    // Normalize each individual entry too — handles the case where an
+    // element inside the array is itself a JSON string instead of an
+    // already-parsed { date, count } object
+    rawHistory = rawHistory
+      .map(entry => {
+        let normalized = entry;
+        if (typeof normalized === 'string') {
+          try {
+            normalized = JSON.parse(normalized);
+          } catch (e) {
+            return null;
+          }
+        }
+        if (!normalized || typeof normalized !== 'object' || !normalized.date) {
+          return null;
+        }
+        return { date: normalized.date, count: Number(normalized.count) || 0 };
+      })
+      .filter(entry => entry !== null); // drop anything unrecoverable
+
+    const todayHits = selectedProduct.todays_hits || 0;
+
     const todayStr = new Date().toISOString().slice(0, 10);
-    
-    // Check if today is already archived in the hits block to prevent layout duplication rendering
+
     const hasTodayInHistory = rawHistory.some(h => h.date === todayStr);
-    const fullTimeline = hasTodayInHistory 
-      ? [...rawHistory] 
+    const fullTimeline = hasTodayInHistory
+      ? rawHistory.map(h => h.date === todayStr ? { ...h, count: todayHits } : h)
       : [...rawHistory, { date: todayStr, count: todayHits }];
 
     if (timeframe === 'daily') {
       const dailyPoints = fullTimeline.map(item => ({
-        label: item.date, // Outputs "2026-06-24", "2026-06-25", etc.
+        label: item.date,
         views: item.count
       }));
       setChartData(dailyPoints);
-      
+
     } else if (timeframe === 'monthly') {
       const monthlyMap = {};
       fullTimeline.forEach(item => {
-        const monthKey = item.date.slice(0, 7); // Groups by "2026-06"
+        const monthKey = item.date.slice(0, 7);
         monthlyMap[monthKey] = (monthlyMap[monthKey] || 0) + item.count;
       });
-      
+
       const monthlyPoints = Object.keys(monthlyMap).sort().map(key => ({
         label: key,
         views: monthlyMap[key]
@@ -67,7 +94,7 @@ const AnalyticsDashboard = () => {
     } else if (timeframe === 'yearly') {
       const yearlyMap = {};
       fullTimeline.forEach(item => {
-        const yearKey = item.date.slice(0, 4); // Groups by "2026"
+        const yearKey = item.date.slice(0, 4);
         yearlyMap[yearKey] = (yearlyMap[yearKey] || 0) + item.count;
       });
 
@@ -82,8 +109,30 @@ const AnalyticsDashboard = () => {
 
   // Helper calculation to aggregate lifetime clicks per item card bubble representation
   const calculateLifetimeHits = (item) => {
-    const historicalSum = item.hits?.reduce((acc, currentDay) => acc + (currentDay.count || 0), 0) || 0;
-    return historicalSum + (item.todaysHits || 0);
+    let hitsArray = item.hits;
+
+    if (typeof hitsArray === 'string') {
+      try {
+        hitsArray = JSON.parse(hitsArray);
+      } catch (e) {
+        hitsArray = [];
+      }
+    }
+    if (!Array.isArray(hitsArray)) hitsArray = [];
+
+    const historicalSum = hitsArray.reduce((acc, currentDay) => {
+      let entry = currentDay;
+      if (typeof entry === 'string') {
+        try {
+          entry = JSON.parse(entry);
+        } catch (e) {
+          return acc;
+        }
+      }
+      return acc + (Number(entry?.count) || 0);
+    }, 0);
+
+    return historicalSum + (item.todays_hits || 0);
   };
 
  return (
@@ -93,7 +142,7 @@ const AnalyticsDashboard = () => {
         <div className="row">
           <Nav />
 
-          <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
+          <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
           <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
             <div>
             <nav aria-label="breadcrumb">
@@ -164,13 +213,11 @@ const AnalyticsDashboard = () => {
           {/* --- SELECTION GRID COMPONENT --- */}
           <div className="card-body p-4 bg-white">
             
-            {/* 🚀 NEW: Search Bar & Section Header Row */}
             <div className="d-flex flex-column flex-sm-row justify-content-between align-items-stretch align-items-sm-center gap-3 mb-4">
               <h6 className="fw-bold mb-0 text-secondary text-uppercase small tracking-wide">
                 Select Vehicle Track
               </h6>
               
-              {/* Search Input Box */}
               <div className="position-relative" style={{ maxWidth: '350px', width: '100%' }}>
                 <input
                   type="text"
@@ -180,7 +227,6 @@ const AnalyticsDashboard = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ padding: '0.5rem 1rem 0.5rem 2.5rem' }}
                 />
-                {/* Dynamic Search / Clear Icon */}
                 <div className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted">
                   {searchQuery ? (
                     <i className="bi bi-x-circle-fill cursor-pointer" onClick={() => setSearchQuery('')}></i>
@@ -191,18 +237,17 @@ const AnalyticsDashboard = () => {
               </div>
             </div>
             
-              {/* --- SELECTION GRID WITH SEARCH FILTER APPLIED --- */}
               <div className="row row-cols-2 row-cols-md-4 row-cols-lg-5 g-3">
                 {analyticsData
                   .filter((item) => 
                     item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())
                   )
                   .map((item) => {
-                    const isSelected = selectedProduct && selectedProduct._id === item._id;
-                    const itemImageSrc = item.image[0] ? item.image[0] : null;
+                    const isSelected = selectedProduct && selectedProduct.id === item.id;
+                    const itemImageSrc = item.image && item.image[0] ? item.image[0] : null;
 
                     return (
-                      <div className="col" key={item._id}>
+                      <div className="col" key={item.id}>
                         <div 
                           onClick={() => setSelectedProduct(item)}
                           className={`card h-100 rounded-3 border transition-all ${
@@ -212,11 +257,10 @@ const AnalyticsDashboard = () => {
                           }`}
                           style={{ cursor: 'pointer', transition: 'all 0.2s ease-in-out' }}
                         >
-                          {/* Image Frame Viewport Container */}
                           <div className="bg-light d-flex align-items-center justify-content-center overflow-hidden rounded-top-3" style={{ height: '120px' }}>
                             {itemImageSrc ? (
                               <img 
-                                src={`http://localhost:3000/public/uploads/products/${itemImageSrc}`} 
+                                src={`${base_url}public${itemImageSrc}`} 
                                 alt={item.name} 
                                 className="w-100 h-100 object-fit-cover"
                               />
@@ -225,7 +269,6 @@ const AnalyticsDashboard = () => {
                             )}
                           </div>
 
-                          {/* Core Card Info Tally Metadata */}
                           <div className="card-body p-3 d-flex flex-column justify-content-between">
                             <p className="card-title fw-bold text-truncate mb-1 small" title={item.name}>
                               {item.name}
@@ -243,7 +286,6 @@ const AnalyticsDashboard = () => {
                   })}
               </div>
 
-              {/* 🚀 NEW: Fallback UI State if no match is found */}
               {analyticsData.filter((item) => item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
                 <div className="text-center py-5">
                   <i className="bi bi-patch-question text-muted h3"></i>
@@ -256,7 +298,6 @@ const AnalyticsDashboard = () => {
 
           <div className="d-flex flex-column gap-4 mt-4">
 
-          {/* TOP CARD: Animated Orange Graph Section */}
             <div className="col-12">
               <div className="graph-container-vertical shadow-lg">
                 <div className="graph-overlay"></div>

@@ -1,12 +1,11 @@
 import React, { useMemo, useState, useEffect } from "react";
-import api from "../../api.jsx";
+import api, {base_url} from "../../api.jsx";
 import Navbar from "../../components/NavBar/NavBar.jsx";
 import Filter, { emptyFilters } from "../../components/Filter/Filter.jsx";
 import { useNavigate } from "react-router-dom";
 import "./Inventory.css";
 
 const Inventory = () => {
-  const base_url = "http://localhost:3000";
   const [CARS, setCARS] = useState([]); // <-- default to empty array, not null
   const [loading, setLoading] = useState(true); // <-- was missing entirely
   const [filters, setFilters] = useState(emptyFilters);
@@ -103,7 +102,7 @@ const Inventory = () => {
                     <div className="col" key={car.id}>
                       <div className="dcr-inv-card">
                         <div className="dcr-inv-img-wrap">
-                          <img src={`${base_url}/public/uploads/products/${car.img[0]}`} alt={car.name} loading="lazy" />
+                          <img src={`${base_url}public${car.img[0]}`} alt={car.name} loading="lazy" />
                           <span className="dcr-inv-type-tag">{car.type}</span>
                           {car.status === "Available" ? (
                             <span className="dcr-status-badge dcr-status-badge--available">

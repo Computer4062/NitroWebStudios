@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
-import api from "../../../api.jsx"
+import api, {base_url} from "../../../api.jsx"
 
 function Accounts() {
 	const navigate = useNavigate();
@@ -28,7 +28,7 @@ function Accounts() {
 
 			} catch (error) {
 				// Axios throws here on 401 (or any non-2xx) — not logged in at all
-				navigate("/login");
+				navigate("/dashboard");
 			}
 		}
 
@@ -285,7 +285,7 @@ function Accounts() {
 
 							<div className="col-12 col-md-4 text-center order-1 order-md-2 border-md-start"> 
 								<img 
-									src={`http://localhost:3000/public/uploads/profiles/${selectedUser.profile_img}`} 
+									src={`${base_url}public/uploads/profiles/${selectedUser.profile_img}`} 
 									className="rounded-circle img-thumbnail shadow-sm mb-3 mb-md-2"
 									style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
 									alt="Profile"
@@ -320,7 +320,7 @@ function Accounts() {
 								<tr key={user.id}>
 									<td>
 										<div className="d-flex align-items-center">
-											<img src={`http://localhost:3000/public/uploads/profiles/${user.profile_img}`} className="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
+											<img src={`${base_url}public/uploads/profiles/${user.profile_img}`} className="rounded-circle me-3" width="35" height="35" style={{objectFit: 'cover'}} />
 											<span className="fw-bold text-dark">{user.username}</span>
 										</div>
 									</td>

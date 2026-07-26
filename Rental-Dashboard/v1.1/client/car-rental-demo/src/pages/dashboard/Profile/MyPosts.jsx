@@ -3,9 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
-import api from "../../../api.jsx"
-
-const base_url = "http://localhost:3000";
+import api, {base_url} from "../../../api.jsx"
 
 const BRAND_OPTIONS = [
 	"Ferrari", "Lamborghini", "Rolls-Royce", "Bentley", "Porsche",
@@ -218,7 +216,7 @@ function MyPosts() {
 			</div>
 			
 			<div className="btn-toolbar mb-2 mb-md-0">
-			<Link to="/dashboard/items/add" className="btn btn-primary shadow-sm d-flex align-items-center gap-2">
+			<Link to="/nws-dash/dashboard/items/add" className="btn btn-primary shadow-sm d-flex align-items-center gap-2">
 				<i className="bi bi-plus-lg"></i> Add a new Vehicle
 			</Link>
 			</div>
@@ -340,7 +338,7 @@ function MyPosts() {
 								{/* Image Section */}
 								<div className="col-4 position-relative">
 									<img
-									src={`${base_url}/public${item.img && item.img[0] ? item.img[0] : ''}`}
+									src={`${base_url}public${item.img && item.img[0] ? item.img[0] : ''}`}
 									className="object-fit-cover w-100" 
 									alt={item.name || 'Vehicle'}
 									style={{ 
@@ -390,7 +388,7 @@ function MyPosts() {
 
 									{/* Actions Section — always shown since this page already only lists the current user's items */}
 									<div className="d-flex gap-2 mt-auto pt-3">
-									<Link to={`/dashboard/items/editor`} className="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1">
+									<Link to={`/nws-dash/dashboard/items/editor`} className="btn btn-sm btn-outline-secondary w-100 d-flex align-items-center justify-content-center gap-1">
 										<i className="bi bi-eye"></i> View
 									</Link>
 
@@ -401,7 +399,7 @@ function MyPosts() {
 										<i className="bi bi-trash"></i> Delete
 									</button>
 
-									<Link to={`/dashboard/items/editor`} state={{ vehicle: item }} className="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
+									<Link to={`/nws-dash/dashboard/items/editor`} state={{ vehicle: item }} className="btn btn-sm btn-primary w-100 d-flex align-items-center justify-content-center gap-1">
 										<i className="bi bi-pencil-square"></i> Edit
 									</Link>
 									</div>

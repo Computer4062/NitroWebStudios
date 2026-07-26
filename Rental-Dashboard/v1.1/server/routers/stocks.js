@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import pool from "../db.js" // MySQL pool
 
 import Logger from "../utils/Logger.js"
+import { jsonArrayNormalizer } from '../utils/normalizer.js';
 
 // Router configuration
 const router = express.Router();
@@ -179,33 +180,50 @@ router.put('/user/update/:id', upload.array('images'), async (req, res) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        const existingVehicle = existingRows.map(row => {
-            return {
-                ...row,
-                img: typeof row.img === 'string' ? JSON.parse(row.img) : row.img
-            };
+        const existingVehicle = {
+            ...existingRows[0],
+            img: typeof existingRows[0].img === 'string' ? JSON.parse(existingRows[0].img) : existingRows[0].img
+        };
+
+        // 2. Determine which existing images the frontend wants to KEEP.
+        //    Sent as a JSON string of paths, e.g. '["/uploads/products/abc.jpg"]'
+        let keptImages = [];
+        if (req.body.existingImages) {
+            try {
+                keptImages = JSON.parse(req.body.existingImages);
+            } catch (e) {
+                keptImages = [];
+            }
+        }
+
+        // 3. Figure out which OLD images are no longer wanted, and delete only those from disk
+        const imagesToDelete = (existingVehicle.img || []).filter(
+            oldPath => !keptImages.includes(oldPath)
+        );
+
+        imagesToDelete.forEach(filePath => {
+            const cleanPath = filePath.replace(/^\/+|;+/g, '');
+            const absolutePath = path.join(__dirname, '..', 'public', cleanPath);
+
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+            }
         });
 
-        // 2. Delete the old physical files from the 'public' folder (only if new images were uploaded)
-        if (req.files && req.files.length > 0 && existingVehicle.img && existingVehicle.img.length > 0) {
-            existingVehicle.img.forEach(filePath => {
-                const cleanPath = filePath.replace(/^\/+|;+/g, '');
-                const absolutePath = path.join(__dirname, '..', 'public', cleanPath);
-
-                if (fs.existsSync(absolutePath)) {
-                    fs.unlinkSync(absolutePath);
-                }
-            });
-        }
-
-        // 3. Build the update payload
+        // 4. Build the update payload
         const updateData = { ...req.body };
+        delete updateData.existingImages; // not a real column, just used to compute img above
 
+        // 5. Combine kept existing images with any newly uploaded files
         if (req.files && req.files.length > 0) {
-            updateData.img = JSON.stringify(req.files.map(file => `/uploads/products/${file.filename}`));
+            const newImagePaths = req.files.map(file => `/uploads/products/${file.filename}`);
+            updateData.img = JSON.stringify([...keptImages, ...newImagePaths]);
+        } else {
+            // No new files uploaded — just persist whichever existing images were kept
+            updateData.img = JSON.stringify(keptImages);
         }
 
-        // 4. Build dynamic SET clause using only whitelisted fields present in the body
+        // 6. Build dynamic SET clause using only whitelisted fields present in the body
         const fieldsToUpdate = Object.keys(updateData).filter(key => ALLOWED_UPDATE_FIELDS.includes(key));
 
         if (fieldsToUpdate.length === 0) {
@@ -214,8 +232,7 @@ router.put('/user/update/:id', upload.array('images'), async (req, res) => {
 
         const setClause = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
         const values = fieldsToUpdate.map(field => {
-            // Normalize boolean/number fields coming from FormData strings
-            if (field === 'draft' || field === 'highlight') {
+            if (field === 'draft' || field === 'highlighted') {
                 return updateData[field] === 'true' || updateData[field] === true ? 1 : 0;
             }
             if (['days_left', 'seats', 'price'].includes(field)) {
@@ -229,9 +246,86 @@ router.put('/user/update/:id', upload.array('images'), async (req, res) => {
             [...values, id]
         );
 
-        // 5. Return the updated row
+        // 7. Return the updated row
         const [updatedRows] = await pool.query('SELECT * FROM vehicles WHERE id = ?', [id]);
         res.json(updatedRows[0]);
+
+    } catch (error) {
+        console.error("Backend Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+// ------------------------------------------------------------------------------------------------- //
+// Given a full inventory path (e.g. "/inventory/5"), extract the ID and return
+// both the vehicle's own details and a list of related vehicles (same type)
+// in a single response — avoids the frontend needing two separate round-trips
+// Safely normalizes a field into a real array, no matter how many layers
+// of JSON stringification it went through
+function normalizeJsonArray(rawValue) {
+    let value = rawValue;
+
+    for (let i = 0; i < 3 && typeof value === 'string'; i++) {
+        try {
+            value = JSON.parse(value);
+        } catch (e) {
+            value = [];
+            break;
+        }
+    }
+
+    return Array.isArray(value) ? value : [];
+}
+
+// ------------------------------------------------------------------------------------------------- //
+router.get('/details-by-path', async (req, res) => {
+    try {
+        const { path: fullPath } = req.query;
+
+        if (!fullPath) {
+            return res.status(400).json({ message: "Missing 'path' query parameter" });
+        }
+
+        const match = fullPath.match(/^\/inventory\/(.+)$/);
+        if (!match) {
+            return res.status(400).json({ message: "Path does not match expected format /inventory/:id" });
+        }
+
+        const idStr = match[1];
+        const id = Number(idStr);
+
+        if (!Number.isInteger(id) || idStr === '') {
+            return res.status(400).json({ message: "Invalid vehicle ID in path" });
+        }
+
+        // 1. Fetch the vehicle itself
+        const [vehicleRows] = await pool.query('SELECT * FROM vehicles WHERE id = ?', [id]);
+
+        if (vehicleRows.length === 0) {
+            return res.status(404).json({ message: "Vehicle not found" });
+        }
+
+        const vehicle = {
+            ...vehicleRows[0],
+            img: normalizeJsonArray(vehicleRows[0].img)
+        };
+
+        // 2. Fetch related vehicles sharing the same type, excluding this one
+        const [relatedRows] = await pool.query(
+            'SELECT * FROM vehicles WHERE type = ? AND id != ? LIMIT 3',
+            [vehicle.type, vehicle.id]
+        );
+
+        const related = relatedRows.map(row => ({
+            ...row,
+            img: normalizeJsonArray(row.img)
+        }));
+
+        // 3. Send both back together, fully normalized
+        res.status(200).json({
+            vehicle,
+            related
+        });
 
     } catch (error) {
         console.error("Backend Error:", error);
@@ -249,10 +343,13 @@ router.delete('/user/delete/:id', async (req, res) => {
         const [rows] = await pool.query('SELECT * FROM vehicles WHERE id = ?', [id]);
         if (rows.length === 0) return res.status(404).json({ message: "Item not found" });
 
-        const vehicle = rows[0];
+        const vehicle = {
+            ...rows[0],
+            img: jsonArrayNormalizer(rows[0].img)
+        };
 
         // 2. Delete physical files from the server
-        if (vehicle.img && vehicle.img.length > 0) {
+        if (vehicle.img.length > 0) {
             vehicle.img.forEach(filePath => {
                 const cleanPath = filePath.replace(/^\/+|;+/g, '');
                 const absolutePath = path.join(__dirname, '..', 'public', cleanPath);

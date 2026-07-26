@@ -21,7 +21,7 @@ function Nav() {
       } catch (error) {
         // Axios throws here on 401 (or any non-2xx), so this is the correct
         // place to handle "not logged in"
-        navigate("/login");
+        navigate("/");
       }
     }
 
@@ -34,7 +34,7 @@ function Nav() {
         withCredentials: true
       });
 
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Logout failed ", error);
     }
@@ -56,7 +56,7 @@ function Nav() {
               {/* Main Navigation */}
               <ul className="nav flex-column px-3 gap-1">
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 fw-bold text-white rounded-2 " href="/dashboard">
+                  <a className="nav-link d-flex align-items-center gap-2 fw-bold text-white rounded-2 " href="/nws-dash/dashboard">
                     <i className="bi bi-speedometer2"></i> Dashboard
                   </a>
                 </li>
@@ -68,12 +68,12 @@ function Nav() {
               </h6>
               <ul className="nav flex-column px-3 gap-1">
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/items">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/items">
                     <i className="bi bi-car-front"></i> Vehicles
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/items/add">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/items/add">
                     <i className="bi bi-plus-circle"></i> Add New
                   </a>
                 </li>
@@ -85,12 +85,12 @@ function Nav() {
               </h6>
               <ul className="nav flex-column px-3 gap-1">
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/logs">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/logs">
                     <i className="bi bi-journal-text"></i> Logs
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/database">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/database">
                     <i className="bi bi-database"></i> Database
                   </a>
                 </li>
@@ -103,23 +103,23 @@ function Nav() {
               <ul className="nav flex-column px-3 gap-1">
                 {isAdmin && (
                   <li className="nav-item">
-                    <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/accounts">
+                    <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/accounts">
                       <i className="bi bi-people"></i> Manage Accounts
                     </a>
                   </li>
                 )}
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/profile">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/profile">
                     <i className="bi bi-person-circle"></i> My Profile
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/mylistings">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/mylistings">
                     <i className="bi bi-collection"></i> My Listings
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/dashboard/info">
+                  <a className="nav-link d-flex align-items-center gap-2 text-white sidebar-link" href="/nws-dash/dashboard/info">
                     <i className="bi bi-question-circle"></i> Info
                   </a>
                 </li>

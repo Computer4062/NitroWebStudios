@@ -17,7 +17,7 @@ const Login = () => {
 				});
 
 				// If we got here without a 401, the user is logged in
-				navigate("/dashboard");
+				navigate("/nws-dash/dashboard");
 
 			} catch(error) {
 				if (error.response?.status === 401) {

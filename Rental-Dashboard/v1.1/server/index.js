@@ -66,6 +66,12 @@ const io = new Server(httpServer, {
 
 initSocket(io);
 
+httpServer.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`);
+});
+
+// Start Backend
+
 app.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT} 🚀`);
 });

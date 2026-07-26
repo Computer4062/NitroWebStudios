@@ -1,13 +1,43 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../api.jsx";
 import Navbar from "../../components/NavBar/NavBar.jsx";
 import "./Details.css";
+import { base_url } from "../../api.jsx";
+
+// --------------------------------------------------------
+import { io } from "socket.io-client";
+
+let sessionId = sessionStorage.getItem('analytics_session_id');
+if (!sessionId) {
+  sessionId = 'sess_' + Math.random().toString(36).substring(2, 15);
+  sessionStorage.setItem('analytics_session_id', sessionId);
+}
+
+const socket = io(base_url, {
+  auth: { sessionId }
+});
+// --------------------------------------------------------
 
 /* ------------------------------------------------------------------ */
 /* Gallery — main image + thumbnail strip + full-screen lightbox.      */
 /* ------------------------------------------------------------------ */
 const Gallery = ({ images, alt }) => {
+  const location = useLocation();
+
+	useEffect(() => {
+		const currentPath = location.pathname;
+
+		if (socket.connected) {
+		socket.emit('page_view', { pagePath: currentPath });
+		} else {
+		socket.once('connect', () => {
+			socket.emit('page_view', { pagePath: currentPath });
+		});
+		}
+
+	}, [location]);
+
   const [active, setActive] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -101,74 +131,61 @@ const Gallery = ({ images, alt }) => {
 
 /**
  * Details page for a single car.
- * Reads the vehicle id from the URL (/inventory/:id) and fetches everything
- * from the backend directly — works on click, direct URL entry, and refresh.
+ * Uses the current URL pathname (e.g. "/inventory/5") directly, and fetches
+ * both the vehicle's own details AND its related cars in a single backend call.
  */
 const Details = () => {
-  const base_url = "http://localhost:3000";
-  const { id } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
-  // The currently viewed vehicle
   const [vehicle, setVehicle] = useState(null);
+  const [CARS, setCARS] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  // CARS: other vehicles of the same type, pulled from the backend
-  const [CARS, setCARS] = useState([]);
-  const [loadingRelated, setLoadingRelated] = useState(true);
-
-  // Fetch the specific vehicle by ID harvested from the URL
+  // Single fetch: pass the current pathname straight to the backend,
+  // which extracts the ID and returns { vehicle, related } together
   useEffect(() => {
-    const fetchVehicle = async () => {
+    const fetchDetails = async () => {
       try {
         setLoading(true);
         setNotFound(false);
-        const response = await api.get(`/api/stocks/find/one/${id}`);
-        // Your route returns an array with a single item: [product]
-        const found = Array.isArray(response.data) ? response.data[0] : response.data;
 
-        if (!found) {
-          setNotFound(true);
-        } else {
-          setVehicle(found);
-        }
+        const response = await api.get('/api/stocks/details-by-path', {
+          params: { path: location.pathname }
+        });
+
+        setVehicle(response.data.vehicle);
+        setCARS(response.data.related || []);
+
       } catch (error) {
-        console.error("Failed to fetch vehicle:", error);
+        console.error("Failed to fetch vehicle details:", error);
         setNotFound(true);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchVehicle();
-  }, [id]);
-
-  // Fetch CARS: other vehicles sharing the same type, once we know it
-  useEffect(() => {
-    if (!vehicle) return;
-
-    const fetchRelated = async () => {
-      try {
-        setLoadingRelated(true);
-        const response = await api.get(`/api/stocks/find/type/${vehicle.type}`);
-        const filtered = response.data.filter((c) => c.id !== vehicle.id);
-        setCARS(filtered.slice(0, 3));
-      } catch (error) {
-        console.error("Failed to fetch related vehicles:", error);
-        setCARS([]);
-      } finally {
-        setLoadingRelated(false);
-      }
-    };
-
-    fetchRelated();
-  }, [vehicle]);
+    fetchDetails();
+  }, [location.pathname]);
 
   // IMG_POOL: gallery images for the selected vehicle, built from its own img JSON array
   const IMG_POOL = useMemo(() => {
-    if (!vehicle || !vehicle.img || vehicle.img.length === 0) return [];
-    return vehicle.img.map((imgPath) => `${base_url}/public/uploads/products/${imgPath}`);
+    if (!vehicle || !vehicle.img) return [];
+
+    let imgArray = vehicle.img;
+
+    if (typeof imgArray === 'string') {
+      try {
+        imgArray = JSON.parse(imgArray);
+      } catch (e) {
+        return [];
+      }
+    }
+
+    if (!Array.isArray(imgArray) || imgArray.length === 0) return [];
+
+    return imgArray.map((imgPath) => `${base_url}public${imgPath}`);
   }, [vehicle]);
 
   const highlights = [
@@ -291,7 +308,7 @@ const Details = () => {
           </div>
 
           {/* Related vehicles (CARS) */}
-          {!loadingRelated && CARS.length > 0 && (
+          {CARS.length > 0 && (
             <div className="dcr-details-related">
               <h2 className="dcr-section-title">You May Also Like</h2>
               <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
@@ -302,7 +319,7 @@ const Details = () => {
                       onClick={() => navigate(`/inventory/${c.id}`)}
                       style={{ cursor: "pointer" }}
                     >
-                      <img src={c.img && c.img[0] ? `${base_url}/public${c.img[0]}` : ""} alt={c.name} />
+                      <img src={c.img && Array.isArray(c.img) && c.img[0] ? `${base_url}public${c.img[0]}` : ""} alt={c.name} />
                       <div className="dcr-related-body">
                         <h3>{c.name}</h3>
                         <p>{c.brand} &bull; {c.type}</p>

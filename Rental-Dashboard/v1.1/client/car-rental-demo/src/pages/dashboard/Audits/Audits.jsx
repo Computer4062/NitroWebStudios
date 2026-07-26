@@ -1,5 +1,6 @@
-import {useState, useEffect} from "react"
+import { useState, useEffect } from "react"
 import { Link } from 'react-router-dom';
+import api from "../../../api.jsx"
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
@@ -9,17 +10,15 @@ function Log() {
 	const [isAdmin, setIsAdmin] = useState(false);
 
 	useEffect(() => {
-		const checkUserAuth = async() => {
-			try{
-				const response = await fetch("http://localhost:3000/api/accounts/check-auth", {
-					method: 'GET',
-					credentials: 'include'
+		const checkUserAuth = async () => {
+			try {
+				const response = await api.get("/api/accounts/check-auth", {
+					withCredentials: true
 				});
 
-				const data = await response.json();
-				setIsAdmin(data.admin);
+				setIsAdmin(response.data.admin);
 
-			} catch(error) {
+			} catch (error) {
 				console.log(error)
 			}
 		}
@@ -32,12 +31,10 @@ function Log() {
 	const [logs, setLogs] = useState([]);
 
 	useEffect(() => {
-		fetch('http://localhost:3000/api/logs/user/logs', {
-			credentials: 'include',
-			method: 'GET'
+		api.get('/api/logs/user/logs', {
+			withCredentials: true
 		})
-			.then(res => res.json())
-			.then(data => setLogs(data))
+			.then(res => setLogs(res.data))
 			.catch(err => console.error("Error fetching logs:", err));
 	}, []);
 
@@ -46,51 +43,43 @@ function Log() {
 	const [logEntries, setLogEntries] = useState(""); // Assuming you use a state like this to hold log text
 
 	const handleClearLogs = async () => {
-	// 1. Prevent accidental wipes with an urgent confirmation pop-up
-	const confirmWipe = window.confirm(
-		"CRITICAL WARNING:\n\nAre you sure you want to permanently clear all system activity logs? This action cannot be undone."
-	);
-	
-	if (!confirmWipe) return;
+		// 1. Prevent accidental wipes with an urgent confirmation pop-up
+		const confirmWipe = window.confirm(
+			"CRITICAL WARNING:\n\nAre you sure you want to permanently clear all system activity logs? This action cannot be undone."
+		);
 
-	try {
-		// 2. Fire the DELETE request to your live Render API endpoint
-		const response = await fetch("http://localhost:3000/api/logs/admin/clear-logs", {
-		method: "DELETE",
-		headers: {
-			"Content-Type": "application/json"
-		},
-		// 🚀 Essential to pass your session tokens/cookies safely
-		credentials: "include" 
-		});
+		if (!confirmWipe) return;
 
-		const data = await response.json();
+		try {
+			// 2. Fire the DELETE request to your live API endpoint
+			const response = await api.delete("/api/logs/admin/clear-logs", {
+				withCredentials: true
+			});
 
-		if (response.ok) {
-		// 3. Inform the admin of a successful clean
-		alert(`Success: ${data.message || "System logs cleared."}`);
-		
-		// 4. Update frontend UI state instantly so the text screen resets
-		// We append a matching initialization line like the backend does
-		const timestamp = new Date().toISOString();
-		setLogEntries(`[${timestamp}] INFO: Log file cleared by Administrator.\n`);
-		
-		} else {
-		// Handles permission failures (e.g., 401 Unauthorized or 403 Forbidden)
-		alert(`Authorization Error: ${data.message || "You do not have permission to clear logs."}`);
+			// 3. Inform the admin of a successful clean
+			alert(`Success: ${response.data.message || "System logs cleared."}`);
+
+			// 4. Update frontend UI state instantly so the text screen resets
+			const timestamp = new Date().toISOString();
+			setLogEntries(`[${timestamp}] INFO: Log file cleared by Administrator.\n`);
+
+		} catch (error) {
+			if (error.response) {
+				// Handles permission failures (e.g., 401 Unauthorized or 403 Forbidden)
+				alert(`Authorization Error: ${error.response.data?.message || "You do not have permission to clear logs."}`);
+			} else {
+				console.error("Network fault while attempting to clear telemetry logs:", error);
+				alert("Network Error: Could not connect to the remote administration server.");
+			}
 		}
-	} catch (error) {
-		console.error("Network fault while attempting to clear telemetry logs:", error);
-		alert("Network Error: Could not connect to the remote administration server.");
-	}
 	};
 
   return (
 	<>
 	  <Dash />
 
-	  <div class="container-fluid">
-	  <div class="row">
+	  <div className="container-fluid">
+	  <div className="row">
 
 		<Nav />
 

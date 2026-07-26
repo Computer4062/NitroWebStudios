@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
-import api from "../../../api.jsx"
+import api, { base_url } from "../../../api.jsx"
 
 const FUEL_TYPE_OPTIONS = ["Electric", "Petrol/Diesel"];
 const BODY_TYPE_OPTIONS = ["Sedan", "SUV", "Coupe", "Convertible", "Roadster", "Van / MPV"];
@@ -41,7 +41,7 @@ function UpdateItem() {
 
 			for (const path of vehicleData.img) {
 				try {
-					const fullUrl = `http://localhost:3000/public${path}`;
+					const fullUrl = `${base_url}public${path}`;
 					const response = await api.get(fullUrl, { responseType: 'blob' });
 					const imageBlob = response.data;
 

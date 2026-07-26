@@ -3,6 +3,24 @@ import pool from '../db.js' // MySQL pool
 
 const router = express.Router();
 
+// Safely normalizes a field into a real array, no matter how many layers
+// of JSON stringification it went through (already-parsed array, single
+// JSON string, double-encoded string, null/undefined, etc.)
+function normalizeJsonArray(rawValue) {
+    let value = rawValue;
+
+    for (let i = 0; i < 3 && typeof value === 'string'; i++) {
+        try {
+            value = JSON.parse(value);
+        } catch (e) {
+            value = [];
+            break;
+        }
+    }
+
+    return Array.isArray(value) ? value : [];
+}
+
 router.get('/user/top-products', async (req, res) => {
     try {
         // 1. Fetch all raw page visit rows targeting inventory routes
@@ -39,9 +57,13 @@ router.get('/user/top-products', async (req, res) => {
 
         // 4. Enrich each visit with product details (or fallback info)
         const enrichedVisits = visitsWithIds.map(({ visit, productId }) => {
+            // Normalize hits right here, at the source, before anything else touches it
+            const normalizedHits = normalizeJsonArray(visit.hits);
+
             if (productId === null) {
                 return {
                     ...visit,
+                    hits: normalizedHits,
                     name: "Unknown Route",
                     image: null
                 };
@@ -50,32 +72,27 @@ router.get('/user/top-products', async (req, res) => {
             const product = productsById[productId];
 
             if (product) {
+                const normalizedImg = normalizeJsonArray(product.img);
+
                 return {
-                    ...visit, // Spreads all original fields: id, path, todays_hits, hits, last_visited
+                    ...visit, // Spreads all original fields: id, path, todays_hits, last_visited
+                    hits: normalizedHits,
                     name: product.name,
-                    image: product.img && product.img.length > 0 ? product.img : null
+                    image: normalizedImg.length > 0 ? normalizedImg : null
                 };
             }
 
             // Fallback if the product was deleted from inventory but the visit data still exists
             return {
                 ...visit,
+                hits: normalizedHits,
                 name: "Deleted Product",
                 image: null
             };
         });
 
-        
-        const parsedRows = enrichedVisits.map(row => {
-            return {
-                ...row,
-                image: typeof row.image === 'string' ? JSON.parse(row.image) : row.image,
-                hits: typeof row.hits === 'string' ? JSON.parse(row.hits) : row.hits,
-            };
-        });
-
         // 5. Send the full dataset downstream without any filtering or sorting
-        res.json(parsedRows);
+        res.json(enrichedVisits);
 
     } catch (err) {
         console.error('Failed to compile enriched product analytics collection:', err);

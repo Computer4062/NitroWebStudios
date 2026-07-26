@@ -1,5 +1,5 @@
-import {useState, useEffect, useRef} from "react"
-import api from "../../../api.jsx"
+import { useState, useEffect, useRef } from "react"
+import api,{base_url} from "../../../api.jsx"
 import Dash from "../../../components/dashboard/Dash.jsx"
 import Nav from "../../../components/dashboard/Nav.jsx"
 
@@ -55,24 +55,24 @@ function Profile() {
     const formData = new FormData();
     formData.append('profileImage', file);
     // Send the username along with the image
-    formData.append('username', username); 
+    formData.append('username', username);
 
     setUploading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/accounts/user/upload-profile-pic", {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
+      const response = await api.post("/api/accounts/user/upload-profile-pic", formData, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        // We add a timestamp (?t=...) to force the browser to reload the image
-        setProfile({ ...profile, profile_img: `${data.filename}?t=${Date.now()}` });
-        alert("Photo updated successfully!");
-      }
+      // We add a timestamp (?t=...) to force the browser to reload the image
+      setProfile({ ...profile, profile_img: `${response.data.filename}?t=${Date.now()}` });
+      alert("Photo updated successfully!");
+
     } catch (error) {
       console.error("Upload failed:", error);
+      alert("Failed to upload photo.");
     } finally {
       setUploading(false);
     }
@@ -83,24 +83,18 @@ function Profile() {
 
   const handleUpdateProfile = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/accounts/admin/update-profile", {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: profile.username, // Use this to find the user
-          ...profileData
-        }),
-        credentials: 'include'
+      const response = await api.put("/api/accounts/user/update-profile", {
+        username: profile.username, // Use this to find the user
+        ...profileData
+      }, {
+        withCredentials: true
       });
 
-      if (response.ok) {
-        alert("Profile updated successfully!");
-      } else {
-        const errorData = await response.json();
-        alert(errorData.message || "Update failed");
-      }
+      alert("Profile updated successfully!");
+
     } catch (error) {
       console.error("Error updating profile:", error);
+      alert(error.response?.data?.message || "Update failed");
     }
   };
 
@@ -109,16 +103,16 @@ function Profile() {
 
   const handleDeleteProfile = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/accounts/user/delete-self/${profile._id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      await api.delete(`/api/accounts/user/delete-self/${profile.id}`, {
+        withCredentials: true
       });
-      if (response.ok) {
-        // Redirect to login or home after deletion
-        window.location.href = '/'; 
-      }
+
+      // Redirect to login or home after deletion
+      window.location.href = '/';
+
     } catch (error) {
       console.error("Deletion failed:", error);
+      alert("Failed to delete profile.");
     }
   };
 
@@ -126,33 +120,33 @@ function Profile() {
     <>
       <Dash />
 
-      <div class="container-fluid">
-      <div class="row">
+      <div className="container-fluid">
+      <div className="row">
 
         <Nav/>
 
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
-          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
-            <h1 class="h2">My Profile</h1>
-            <button type="button" class="btn btn-primary mx-3" onClick={handleUpdateProfile}>Update</button>
+        <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light min-vh-100">
+          <div className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+            <h1 className="h2">My Profile</h1>
+            <button type="button" className="btn btn-primary mx-3" onClick={handleUpdateProfile}>Update</button>
           </div>
 
-          <div class="row">
+          <div className="row">
             {/* Left Column */}
-            <div class="col-12 col-xl-4 mb-4">
-              <div class="card border-0 shadow-sm text-center p-4">
-                <div class="mb-3">
+            <div className="col-12 col-xl-4 mb-4">
+              <div className="card border-0 shadow-sm text-center p-4">
+                <div className="mb-3">
                   <img 
-                    src={`http://localhost:3000/public/uploads/profiles/${profile.profile_img}`} 
-                    class="rounded-circle img-thumbnail shadow-sm" 
+                    src={`${base_url}public/uploads/profiles/${profile.profile_img}`} 
+                    className="rounded-circle img-thumbnail shadow-sm" 
                     alt="Profile" 
                     style={{ width: '150px', height: '150px', objectFit: 'cover' }}
                   />
                 </div>
-                <h5 class="mb-0">{profile.username}</h5>
+                <h5 className="mb-0">{profile.username}</h5>
                 <p className="text-muted small">{profile.admin ? "Admin" : "Editor"}</p>
                 
-                <div class="d-grid gap-2 mt-3">
+                <div className="d-grid gap-2 mt-3">
                   {/* Hidden File Input */}
                   <input 
                     type="file" 
@@ -162,7 +156,7 @@ function Profile() {
                     accept="image/*"
                   />
                   <button 
-                    class="btn btn-outline-secondary btn-sm" 
+                    className="btn btn-outline-secondary btn-sm" 
                     onClick={() => fileInputRef.current.click()}
                     disabled={uploading}
                   >
@@ -174,27 +168,27 @@ function Profile() {
             </div>
 
             {/* Right Column */}
-            <div class="col-12 col-xl-8">
-              <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                  <h6 class="mb-0 fw-bold text-uppercase small">Personal Information</h6>
+            <div className="col-12 col-xl-8">
+              <div className="card border-0 shadow-sm mb-4">
+                <div className="card-header bg-white py-3">
+                  <h6 className="mb-0 fw-bold text-uppercase small">Personal Information</h6>
                 </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    <div class="col-md-6">
-                      <label class="form-label small fw-bold">First Name</label>
+                <div className="card-body">
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">First Name</label>
                       <input 
                         type="text" 
-                        class="form-control" 
+                        className="form-control" 
                         value={profileData.first_name} 
                         onChange={(e) => setProfileData({...profileData, first_name: e.target.value})} 
                       />
                     </div>
-                    <div class="col-md-6">
-                      <label class="form-label small fw-bold">Last Name</label>
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Last Name</label>
                       <input 
                         type="text" 
-                        class="form-control" 
+                        className="form-control" 
                         value={profileData.last_name} 
                         onChange={(e) => setProfileData({...profileData, last_name: e.target.value})} 
                       />
@@ -204,37 +198,37 @@ function Profile() {
               </div>
 
               {/* Account Settings */}
-              <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                  <h6 class="mb-0 fw-bold text-uppercase small">Account Settings</h6>
+              <div className="card border-0 shadow-sm mb-4">
+                <div className="card-header bg-white py-3">
+                  <h6 className="mb-0 fw-bold text-uppercase small">Account Settings</h6>
                 </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    <div class="col-md-6">
-                      <label class="form-label small fw-bold">Email Address</label>
+                <div className="card-body">
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Email Address</label>
                       <input 
                         type="email" 
-                        class="form-control" 
+                        className="form-control" 
                         value={profileData.email} 
                         onChange={(e) => setProfileData({...profileData, email: e.target.value})} 
                       />
                     </div>
-                    <div class="col-md-6">
-                      <label class="form-label small fw-bold">Username</label>
-                      <input type="text" class="form-control" defaultValue={profile.username} disabled />
+                    <div className="col-md-6">
+                      <label className="form-label small fw-bold">Username</label>
+                      <input type="text" className="form-control" defaultValue={profile.username} disabled />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* New Password Section */}
-              <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                  <h6 class="mb-0 fw-bold text-uppercase small">Security</h6>
+              <div className="card border-0 shadow-sm mb-4">
+                <div className="card-header bg-white py-3">
+                  <h6 className="mb-0 fw-bold text-uppercase small">Security</h6>
                 </div>
-                <div class="card-body">
-                  <label class="form-label small fw-bold">Update Password</label>
-                  <div class="input-group">
+                <div className="card-body">
+                  <label className="form-label small fw-bold">Update Password</label>
+                  <div className="input-group">
                     <input 
                       type={showPassword ? "text" : "password"} 
                       className="form-control border-danger" // Red outline
@@ -244,7 +238,7 @@ function Profile() {
                       style={{ border: '2px solid #dc3545' }} // Extra emphasis on the red
                     />
                     <button 
-                      class="btn btn-outline-secondary" 
+                      className="btn btn-outline-secondary" 
                       type="button" 
                       onClick={() => setShowPassword(!showPassword)}
                     >
@@ -252,7 +246,7 @@ function Profile() {
                       {showPassword ? '👁️' : '🙈'} 
                     </button>
                   </div>
-                  <div class="form-text text-danger small">
+                  <div className="form-text text-danger small">
                     Warning: Changing this will update your login credentials.
                   </div>
                 </div>
@@ -289,7 +283,7 @@ function Profile() {
                         </button>
                         <button 
                           className="btn btn-outline-danger flex-grow-1 fw-bold"
-                          onClick={handleDeleteProfile} // This would call your Node.js API
+                          onClick={handleDeleteProfile}
                         >
                           Yes, Delete it
                         </button>
