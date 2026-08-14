@@ -57,8 +57,8 @@ An enterprise-grade, full-stack administrative dashboard built for managing mult
 - **MySQL Server:** `8.0+`
 - **npm:** `v10+`
 
-### 1. Clone the Repository
 ```bash
+### 1. Clone the Repository
 git clone -b master [https://github.com/Computer4062/NitroWebStudios.git](https://github.com/Computer4062/NitroWebStudios.git)
 cd NitroWebStudios
 
