@@ -8,10 +8,6 @@ An enterprise-grade, full-stack administrative dashboard built for managing mult
 - [Key Features](#-key-features)
 - [Tech Stack & Architecture](#-tech-stack--architecture)
 - [Getting Started](#-getting-started)
-- [Environment Configuration](#-environment-configuration)
-- [API Reference](#-api-reference)
-- [Production Deployment](#-production-deployment)
-- [Security & Optimization](#-security--optimization)
 
 ---
 
